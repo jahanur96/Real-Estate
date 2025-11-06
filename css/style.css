@@ -207,6 +207,9 @@
     display: none;
     color: #DDDDDD;
 }
+.breadcrumb-item::before {
+    display: none;
+}
 
 
 /*** Icon ***/
