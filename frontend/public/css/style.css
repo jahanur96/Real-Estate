@@ -205,7 +205,10 @@
 
 .breadcrumb-item + .breadcrumb-item::before {
     display: none;
-    color: #DDDDDD;
+    color: #DDDDDD !important;
+}
+.breadcrumb-item::before {
+    display: none !important;
 }
 
 
