@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Poppins", sans-serif;
+      }
+
+      :root {
+        --primary: #00b894; /* index page এর main color */
+        --muted: #f0f0f0;
+        --text: #222;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          rgba(240, 248, 255, 0.85),
+          rgba(224, 255, 255, 0.85)
+        ); /* index page এর background এর মত */
+        color: var(--text);
+        padding: 24px;
+      }
+
+      .form-box {
+        width: 100%;
+        max-width: 400px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 36px 32px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      }
+
+      .title-row {
+        text-align: center;
+        margin-bottom: 22px;
+      }
+
+      .title-row h1 {
+        font-size: 24px;
+        color: var(--primary);
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 8px;
+      }
+
+      .title-row h1::after {
+        content: "";
+        width: 36px;
+        height: 4px;
+        background: var(--primary);
+        display: block;
+        margin: 8px auto 0;
+        border-radius: 3px;
+      }
+
+      form {
+        width: 100%;
+      }
+
+      .input-field {
+        background: var(--muted);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        margin: 12px 0;
+        transition: all 0.35s ease;
+      }
+
+      .input-field input {
+        border: 0;
+        outline: 0;
+        background: transparent;
+        width: 100%;
+        font-size: 15px;
+        padding: 8px 0;
+      }
+
+      .input-field i {
+        color: rgba(0, 0, 0, 0.45);
+        font-size: 18px;
+        width: 20px;
+        text-align: center;
+      }
+
+      .btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 999px;
+        border: 0;
+        cursor: pointer;
+        font-weight: 600;
+        background: var(--primary);
+        color: #fff;
+        transition: all 0.25s ease;
+        margin-top: 16px;
+      }
+
+      .btn:hover {
+        background: #00d6a0; /* hover color index page এর shade অনুযায়ী */
+      }
+
+      #message {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      @media (max-width: 420px) {
+        .form-box {
+          padding: 26px 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="form-box">
+      <div class="title-row">
+        <h1>Login</h1>
+      </div>
+
+      <form id="loginForm" onsubmit="return false;">
+        <label class="input-field" for="emailInput">
+          <i class="fa-solid fa-envelope"></i>
+          <input
+            id="emailInput"
+            type="text"
+            placeholder="Username or Email"
+            required
+          />
+        </label>
+
+        <label class="input-field" for="passwordInput">
+          <i class="fa-solid fa-lock"></i>
+          <input
+            id="passwordInput"
+            type="password"
+            placeholder="Password"
+            required
+          />
+        </label>
+
+        <button class="btn" type="button" onclick="login()">Login</button>
+        <p id="message"></p>
+      </form>
+    </div>
+
+    <script>
+      async function login() {
+        const username = document.getElementById("emailInput").value.trim();
+        const password = document.getElementById("passwordInput").value.trim();
+        const msg = document.getElementById("message");
+
+        if (!username || !password) {
+          msg.style.color = "red";
+          msg.textContent = "Please fill in all fields.";
+          return;
+        }
+
+        const res = await fetch("http://localhost:5000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: username, password }),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          msg.style.color = "green";
+          msg.textContent = "Login successful! Redirecting...";
+          if (data.role === "admin") {
+            window.location.href = "http://localhost:5000/admin";
+          } else {
+            window.location.href = "http://localhost:5000/admin/404.html";
+          }
+        } else {
+          msg.style.color = "red";
+          msg.textContent = data.message || "Invalid username or password.";
+        }
+      }
+    </script>
+  </body>
+</html>
