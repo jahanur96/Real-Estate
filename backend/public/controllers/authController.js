@@ -1,7 +1,7 @@
-const db = require("../../db");
+const pool = require("../../db"); // PostgreSQL connection file
 
-exports.login = (req, res) => {
-  const { email, password } = req.body; // <-- email আছে
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return res
@@ -9,22 +9,20 @@ exports.login = (req, res) => {
       .json({ success: false, message: "Email and password required" });
   }
 
-  const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-  db.query(sql, [email, password], (err, results) => {
-    if (err) {
-      console.error("❌ Database query error:", err);
-      return res
-        .status(500)
-        .json({ success: false, message: "Database error" });
-    }
+  try {
+    // ✅ PostgreSQL syntax uses $1, $2 placeholders
+    const result = await pool.query(
+      "SELECT * FROM users WHERE email = $1 AND password = $2",
+      [email, password]
+    );
 
-    if (results.length === 0) {
+    if (result.rows.length === 0) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    const user = results[0];
+    const user = result.rows[0];
     if (user.role === "admin") {
       return res.json({
         success: true,
@@ -38,5 +36,8 @@ exports.login = (req, res) => {
         role: "guest",
       });
     }
-  });
+  } catch (err) {
+    console.error("❌ Database query error:", err);
+    return res.status(500).json({ success: false, message: "Database error" });
+  }
 };

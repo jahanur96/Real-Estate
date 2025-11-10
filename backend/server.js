@@ -2,23 +2,46 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
+const fs = require("fs");
+
 const authRoutes = require("./public/routes/authRoutes");
+const categoryRoutes = require("./admin/routes/categoryRoutes");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname)));
 
-// Admin static folder serve
+// Serve admin static files
 app.use("/admin", express.static(path.join(__dirname, "../frontend/admin")));
-// Routes
-app.use("/", authRoutes);
+app.use(
+  "/admin/uploads",
+  express.static(path.join(__dirname, "../frontend/admin/uploads"))
+);
 
-// Example route
-app.get("/", (req, res) => {
-  res.send("Server is running");
+// Catch-all for admin HTML pages (like category.html)
+app.get("/admin/:page", (req, res) => {
+  const page = req.params.page;
+  const filePath = path.join(__dirname, "../frontend/admin", `${page}.html`);
+
+  // Check if file exists
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send("Page not found");
+  }
 });
 
-app.listen(5000, () => {
-  console.log("🚀 Server running on http://localhost:5000");
+// API routes
+app.use("/", authRoutes);
+app.use("/category", categoryRoutes);
+
+// Test route
+app.get("/", (req, res) => res.send("Server is running"));
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
