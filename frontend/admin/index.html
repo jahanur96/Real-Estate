@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard</title>
 
-    <!-- Google Font -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
-    />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
     <!-- AdminLTE -->
@@ -160,6 +155,26 @@
                   <p>Category</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="featurecategory.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Feature Category</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="sliders.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Sliders</p>
+                </a>
+              </li>
             </ul>
           </nav>
         </div>
@@ -238,6 +253,17 @@
         const path = window.location.pathname;
         if (path.includes("/admin/category")) {
           loadPage("category.html", false);
+        } else {
+          loadPage("home", false);
+        }
+
+        if (path.includes("/admin/feature-category")) {
+          loadPage("featurecategory.html", false);
+        } else {
+          loadPage("home", false);
+        }
+        if (path.includes("/admin/sliders")) {
+          loadPage("Sliders.html", false);
         } else {
           loadPage("home", false);
         }

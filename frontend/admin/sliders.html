@@ -1,0 +1,201 @@
+<div class="container-fluid">
+  <h4 class="mb-3">Slider Management</h4>
+
+  <form id="sliderForm" class="mb-4" enctype="multipart/form-data" novalidate>
+    <div class="form-group mb-2">
+      <label>Slider Title</label>
+      <input
+        type="text"
+        id="title"
+        class="form-control"
+        placeholder="Enter Title"
+        required
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Description</label>
+      <input
+        type="text"
+        id="short_description"
+        class="form-control"
+        placeholder="Enter Description"
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>URL</label>
+      <input
+        type="text"
+        id="url"
+        class="form-control"
+        placeholder="Enter URL"
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Slider Image</label>
+      <input type="file" id="image" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" id="priority" class="form-check-input" />
+      <label for="priority" class="form-check-label"
+        >Mark as Priority Slider</label
+      >
+    </div>
+
+    <button type="button" id="submitBtn" class="btn btn-success">
+      Add Slider
+    </button>
+  </form>
+
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>URL</th>
+        <th>Image</th>
+        <th>Priority</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="sliderTable"></tbody>
+  </table>
+</div>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+  function initSliderPage() {
+    const API_URL = "http://localhost:5000/sliders"; // backend route
+    let editId = null;
+
+    const tableBody = document.getElementById("sliderTable");
+    const submitBtn = document.getElementById("submitBtn");
+
+    async function loadSliders() {
+      try {
+        const res = await fetch(API_URL);
+        const result = await res.json();
+        renderTable(result.data); // <-- use result.data
+      } catch (err) {
+        console.error("Error loading sliders:", err);
+        toastr.error("Failed to load sliders.");
+      }
+    }
+
+    function renderTable(sliders) {
+      tableBody.innerHTML = "";
+      if (!sliders || !sliders.length) {
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-muted">No sliders found.</td></tr>`;
+        return;
+      }
+
+      sliders.forEach((slider) => {
+        const imageCell = slider.image
+          ? `<img src="http://localhost:5000${slider.image}" width="80" height="60" style="object-fit:cover;border-radius:8px;"/>`
+          : "-";
+
+        const priorityBadge = slider.poirity
+          ? `<span class="badge bg-success">Yes</span>`
+          : `<span class="badge bg-secondary">No</span>`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${slider.id}</td>
+            <td>${slider.title}</td>
+            <td>${slider.short_description || "-"}</td>
+            <td><a href="${slider.url || "#"}" target="_blank">${
+          slider.url || "-"
+        }</a></td>
+            <td>${imageCell}</td>
+            <td>${priorityBadge}</td>
+            <td>
+              <button class="btn btn-warning btn-sm editBtn">Edit</button>
+              <button class="btn btn-danger btn-sm deleteBtn">Delete</button>
+            </td>
+          `;
+
+        row.querySelector(".editBtn").addEventListener("click", () => {
+          document.getElementById("title").value = slider.title;
+          document.getElementById("short_description").value =
+            slider.short_description || "";
+          document.getElementById("url").value = slider.url || "";
+          document.getElementById("priority").checked = slider.poirity === 1;
+          editId = slider.id;
+          submitBtn.textContent = "Update Slider";
+        });
+
+        row.querySelector(".deleteBtn").addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to delete this slider?")) return;
+          try {
+            const res = await fetch(`${API_URL}/${slider.id}`, {
+              method: "DELETE",
+            });
+            const data = await res.json();
+            if (!data.success)
+              throw new Error(data.message || "Error deleting slider");
+            toastr.success(data.message);
+            loadSliders();
+          } catch (err) {
+            console.error("Delete error:", err);
+            toastr.error(err.message || "Error deleting slider");
+          }
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      const form = document.getElementById("sliderForm");
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", document.getElementById("title").value);
+      formData.append(
+        "short_description",
+        document.getElementById("short_description").value
+      );
+      formData.append("url", document.getElementById("url").value);
+      formData.append(
+        "poirity",
+        document.getElementById("priority").checked ? 1 : 0
+      );
+
+      const file = document.getElementById("image").files[0];
+      if (file) formData.append("image", file);
+
+      try {
+        const method = editId ? "PUT" : "POST";
+        const url = editId ? `${API_URL}/${editId}` : API_URL;
+        const res = await fetch(url, { method, body: formData });
+        const data = await res.json();
+        if (!data.success)
+          throw new Error(data.message || "Error saving slider");
+
+        toastr.success(data.message);
+        editId = null;
+        submitBtn.textContent = "Add Slider";
+        form.reset();
+        loadSliders();
+      } catch (err) {
+        console.error("Error saving slider:", err);
+        toastr.error(err.message || "Error saving slider");
+      }
+    });
+
+    loadSliders();
+  }
+
+  initSliderPage();
+</script>

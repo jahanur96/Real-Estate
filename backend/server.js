@@ -6,6 +6,8 @@ const fs = require("fs");
 
 const authRoutes = require("./public/routes/authRoutes");
 const categoryRoutes = require("./admin/routes/categoryRoutes");
+const featureCategoryRoutes = require("./admin/routes/featurecategoryRoutes");
+const sliderRoutes = require("./admin/routes/sliderRoutes");
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.get("/admin/:page", (req, res) => {
 // API routes
 app.use("/", authRoutes);
 app.use("/category", categoryRoutes);
+app.use("/feature-category", featureCategoryRoutes);
+app.use("/sliders", sliderRoutes);
 
 // Test route
 app.get("/", (req, res) => res.send("Server is running"));

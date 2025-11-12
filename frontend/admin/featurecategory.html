@@ -1,0 +1,191 @@
+<div class="container-fluid">
+  <h4 class="mb-3">Feature Category Management</h4>
+
+  <form id="categoryForm" class="mb-4" enctype="multipart/form-data" novalidate>
+    <div class="form-group mb-2">
+      <label>Feature Category Name</label>
+      <input
+        type="text"
+        id="category_name"
+        class="form-control"
+        placeholder="Category Name"
+        required
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Slug</label>
+      <input
+        type="text"
+        id="slug"
+        class="form-control"
+        placeholder="Slug"
+        required
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Category Image</label>
+      <input type="file" id="icon" class="form-control" accept="image/*" />
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" id="is_special" class="form-check-input" />
+      <label for="is_special" class="form-check-label">Mark as Special</label>
+    </div>
+
+    <button type="button" id="submitBtn" class="btn btn-success">
+      Add Feature Category
+    </button>
+  </form>
+
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Slug</th>
+        <th>Image</th>
+        <th>Special</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="categoryTable"></tbody>
+  </table>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+  function initCategoryPage() {
+    const API_URL = "http://localhost:5000/feature-category"; // backend route
+    let editId = null;
+
+    const tableBody = document.getElementById("categoryTable");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Load all categories
+    async function loadCategories() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        renderTable(data);
+      } catch (err) {
+        console.error("Error loading categories:", err);
+        toastr.error("Failed to load categories.");
+      }
+    }
+
+    // Render table
+    function renderTable(data) {
+      tableBody.innerHTML = "";
+      if (!data.length) {
+        tableBody.innerHTML =
+          "<tr><td colspan='6' class='text-muted'>No feature categories found.</td></tr>";
+        return;
+      }
+
+      data.forEach((cat) => {
+        const imageCell = cat.image
+          ? `<img src="http://localhost:5000${cat.image}" width="60" height="60" style="object-fit:cover;border-radius:8px;"/>`
+          : "-";
+
+        const specialBadge = cat.is_special
+          ? `<span class="badge bg-success">Yes</span>`
+          : `<span class="badge bg-secondary">No</span>`;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${cat.id}</td>
+        <td>${cat.category_name}</td>
+        <td>${cat.slug}</td>
+        <td>${imageCell}</td>
+        <td>${specialBadge}</td>
+        <td>
+          <button class="btn btn-warning btn-sm editBtn"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm deleteBtn"><i class="fas fa-trash"></i></button>
+        </td>
+      `;
+
+        // Edit button
+        row.querySelector(".editBtn").addEventListener("click", () => {
+          document.getElementById("category_name").value = cat.category_name;
+          document.getElementById("slug").value = cat.slug;
+          document.getElementById("is_special").checked = cat.is_special === 1;
+          editId = cat.id;
+          submitBtn.textContent = "Update Feature Category";
+        });
+
+        // Delete button
+        row.querySelector(".deleteBtn").addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to delete this category?"))
+            return;
+          try {
+            const res = await fetch(`${API_URL}/${cat.id}`, {
+              method: "DELETE",
+            });
+            const data = await res.json();
+            if (!data.success)
+              throw new Error(data.message || "Error deleting category");
+            toastr.success(data.message);
+            loadCategories();
+          } catch (err) {
+            console.error("Delete error:", err);
+            toastr.error(err.message || "Error deleting category");
+          }
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Add or Update Category
+    submitBtn.addEventListener("click", async () => {
+      const form = document.getElementById("categoryForm");
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append(
+        "category_name",
+        document.getElementById("category_name").value
+      );
+      formData.append("slug", document.getElementById("slug").value);
+      formData.append(
+        "is_special",
+        document.getElementById("is_special").checked ? 1 : 0
+      );
+
+      // ✅ Field name matches backend multer upload
+      const file = document.getElementById("icon").files[0];
+      if (file) formData.append("icon", file);
+
+      try {
+        const method = editId ? "PUT" : "POST";
+        const url = editId ? `${API_URL}/${editId}` : API_URL;
+        const res = await fetch(url, { method, body: formData });
+        const data = await res.json();
+        if (!data.success)
+          throw new Error(data.message || "Error saving category");
+
+        toastr.success(data.message);
+        editId = null;
+        submitBtn.textContent = "Add Feature Category";
+        form.reset();
+        loadCategories();
+      } catch (err) {
+        console.error("Error saving category:", err);
+        toastr.error(err.message || "Error saving category");
+      }
+    });
+
+    loadCategories();
+  }
+
+  initCategoryPage();
+</script>
