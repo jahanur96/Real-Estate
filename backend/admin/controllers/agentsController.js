@@ -39,7 +39,7 @@ exports.create = (req, res) => {
       const newId = result.rows.length > 0 ? result.rows[0].id : null;
       res.json({
         success: true,
-        message: "✅ Agent added successfully!",
+        message: " Agent added successfully!",
         id: newId,
       });
     }
@@ -67,14 +67,16 @@ exports.update = (req, res) => {
         [name, designation, image, facebook, twitter, instagram, id],
         (err) => {
           if (err)
-            return res.status(500).json({ success: false, message: err.message });
+            return res
+              .status(500)
+              .json({ success: false, message: err.message });
 
           // Delete old image if exists
           if (oldImage) deleteFile(oldImage);
 
           res.json({
             success: true,
-            message: "✅ Agent updated successfully (with new image)!",
+            message: " Agent updated successfully (with new image)!",
           });
         }
       );
@@ -86,10 +88,12 @@ exports.update = (req, res) => {
         [name, designation, facebook, twitter, instagram, id],
         (err) => {
           if (err)
-            return res.status(500).json({ success: false, message: err.message });
+            return res
+              .status(500)
+              .json({ success: false, message: err.message });
           res.json({
             success: true,
-            message: "✅ Agent updated successfully!",
+            message: " Agent updated successfully!",
           });
         }
       );
