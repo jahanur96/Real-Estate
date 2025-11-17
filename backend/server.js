@@ -8,7 +8,6 @@ const authRoutes = require("./public/routes/authRoutes");
 const categoryRoutes = require("./admin/routes/categoryRoutes");
 const featureCategoryRoutes = require("./admin/routes/featurecategoryRoutes");
 const sliderRoutes = require("./admin/routes/sliderRoutes");
-const propertiesRoutes = require("./admin/routes/propertiesRoutes");
 
 const app = express();
 
@@ -42,7 +41,6 @@ app.use("/", authRoutes);
 app.use("/category", categoryRoutes);
 app.use("/feature-category", featureCategoryRoutes);
 app.use("/sliders", sliderRoutes);
-app.use("/properties", propertiesRoutes);
 
 // Test route
 app.get("/", (req, res) => res.send("Server is running"));

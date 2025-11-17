@@ -175,16 +175,6 @@
                   <p>Sliders</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a
-                  href="#"
-                  class="nav-link sidebar-link"
-                  data-page="properties.html"
-                >
-                  <i class="nav-icon far fa-image"></i>
-                  <p>Properties</p>
-                </a>
-              </li>
             </ul>
           </nav>
         </div>
@@ -274,11 +264,6 @@
         }
         if (path.includes("/admin/sliders")) {
           loadPage("Sliders.html", false);
-        } else {
-          loadPage("home", false);
-        }
-        if (path.includes("/admin/properties")) {
-          loadPage("properties.html", false);
         } else {
           loadPage("home", false);
         }
