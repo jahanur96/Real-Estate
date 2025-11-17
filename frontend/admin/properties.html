@@ -1,0 +1,344 @@
+<div class="container-fluid">
+  <h4 class="mb-3">Property Management</h4>
+
+  <form id="propertyForm" class="mb-4" novalidate>
+    <div class="row">
+      <div class="col-md-4 mb-2">
+        <label>Property Title</label>
+        <input type="text" id="property_title" class="form-control" required />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Price</label>
+        <input type="text" id="price" class="form-control" required />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Category</label>
+        <select id="category" class="form-control" required></select>
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Feature Category</label>
+        <select id="feture_category" class="form-control" required></select>
+      </div>
+
+      <div class="col-md-6 mb-2">
+        <label>Short Description</label>
+        <textarea
+          id="short_description"
+          class="form-control"
+          required
+        ></textarea>
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Location</label>
+        <select id="location" class="form-control" required></select>
+      </div>
+
+      <div class="col-md-6 mb-2">
+        <label>Property Description</label>
+        <textarea
+          id="property_description"
+          class="form-control"
+          required
+        ></textarea>
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Size</label>
+        <input type="text" id="Size" class="form-control" />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Bedrooms</label>
+        <input type="text" id="Bedrooms" class="form-control" />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Bathrooms</label>
+        <input type="text" id="Bathrooms" class="form-control" />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Kitchen</label>
+        <input type="text" id="Kitchen" class="form-control" />
+      </div>
+
+      <div class="col-md-4 mb-2">
+        <label>Year Built</label>
+        <input type="text" id="Year_built" class="form-control" />
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- CHECKBOXES -->
+    <div class="row">
+      <div class="col-md-3">
+        <input type="checkbox" id="Garage" checked /> Garage
+      </div>
+      <div class="col-md-3"><input type="checkbox" id="Heating" /> Heating</div>
+      <div class="col-md-3">
+        <input type="checkbox" id="Air_Conditioning" /> AC
+      </div>
+      <div class="col-md-3">
+        <input type="checkbox" id="Wifi" checked /> Wifi
+      </div>
+
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Security_Cameras" checked /> Security Cameras
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Cable_TV" checked /> Cable TV
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Solar_Power" /> Solar Power
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Fireplace" checked /> Fireplace
+      </div>
+
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Ventilation" checked /> Ventilation
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Internet" checked /> Internet
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Lift" checked /> Lift
+      </div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Dishwasher" /> Dishwasher
+      </div>
+
+      <div class="col-md-3 mt-2"><input type="checkbox" id="Pool" /> Pool</div>
+      <div class="col-md-3 mt-2">
+        <input type="checkbox" id="Parking" checked /> Parking
+      </div>
+      <div class="col-md-3 mt-2"><input type="checkbox" id="Gym" /> Gym</div>
+    </div>
+
+    <button type="button" id="submitBtn" class="btn btn-success mt-3">
+      Add Property
+    </button>
+  </form>
+
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Feature Category</th>
+        <th>Price</th>
+        <th>Location</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="propertyTable"></tbody>
+  </table>
+</div>
+
+<script>
+  async function loadDropdown(url, elementId, valueKey, textKey, placeholder) {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      const dropdown = document.getElementById(elementId);
+      dropdown.innerHTML = `<option value="">${placeholder}</option>`;
+      (data.data || []).forEach((item) => {
+        dropdown.innerHTML += `<option value="${item[valueKey]}">${item[textKey]}</option>`;
+      });
+    } catch (err) {
+      console.error(`Error loading ${elementId}:`, err);
+    }
+  }
+
+  function initPropertyPage() {
+    const API_URL = "http://localhost:5000/properties";
+    const CAT_URL = "http://localhost:5000/category";
+    const FEATURE_URL = "http://localhost:5000/feature-category";
+    const LOCATION_URL = "http://localhost:5000/locations";
+
+    let editId = null;
+    const tableBody = document.getElementById("propertyTable");
+    const submitBtn = document.getElementById("submitBtn");
+
+    async function loadProperties() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        renderTable(data.data || []);
+      } catch (err) {
+        console.error("Error loading properties:", err);
+      }
+    }
+
+    function renderTable(properties) {
+      tableBody.innerHTML = "";
+      if (!properties.length) {
+        tableBody.innerHTML = `<tr><td colspan="7">No property found</td></tr>`;
+        return;
+      }
+      properties.forEach((p) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${p.id}</td>
+        <td>${p.property_title}</td>
+        <td>${p.category_name}</td>
+        <td>${p.feture_category_name}</td>
+        <td>${p.price}</td>
+        <td>${p.location_name}</td>
+        <td>
+          <button class="btn btn-warning btn-sm editBtn" data-id="${p.id}">Edit</button>
+          <button class="btn btn-danger btn-sm deleteBtn" data-id="${p.id}">Delete</button>
+        </td>`;
+        tableBody.appendChild(row);
+      });
+
+      // Add event listeners for edit/delete
+      document
+        .querySelectorAll(".editBtn")
+        .forEach((btn) =>
+          btn.addEventListener("click", () => editProperty(btn.dataset.id))
+        );
+      document
+        .querySelectorAll(".deleteBtn")
+        .forEach((btn) =>
+          btn.addEventListener("click", () => deleteProperty(btn.dataset.id))
+        );
+    }
+
+    function gatherFormData() {
+      const formData = new FormData();
+      [
+        "property_title",
+        "price",
+        "category",
+        "feture_category",
+        "location",
+        "short_description",
+        "property_description",
+        "Size",
+        "Bedrooms",
+        "Bathrooms",
+        "Kitchen",
+        "Year_built",
+      ].forEach((id) => formData.append(id, document.getElementById(id).value));
+
+      [
+        "Garage",
+        "Heating",
+        "Air_Conditioning",
+        "Wifi",
+        "Security_Cameras",
+        "Cable_TV",
+        "Solar_Power",
+        "Fireplace",
+        "Ventilation",
+        "Internet",
+        "Lift",
+        "Dishwasher",
+        "Pool",
+        "Parking",
+        "Gym",
+      ].forEach((id) =>
+        formData.append(id, document.getElementById(id).checked ? 1 : 0)
+      );
+
+      return formData;
+    }
+
+    async function editProperty(id) {
+      try {
+        const res = await fetch(`${API_URL}/${id}`);
+        const data = await res.json();
+        const p = data.data;
+        editId = id;
+        Object.keys(p).forEach((key) => {
+          if (document.getElementById(key))
+            document.getElementById(key).value = p[key];
+          if (
+            [
+              "Garage",
+              "Heating",
+              "Air_Conditioning",
+              "Wifi",
+              "Security_Cameras",
+              "Cable_TV",
+              "Solar_Power",
+              "Fireplace",
+              "Ventilation",
+              "Internet",
+              "Lift",
+              "Dishwasher",
+              "Pool",
+              "Parking",
+              "Gym",
+            ].includes(key)
+          ) {
+            document.getElementById(key).checked = p[key] == 1;
+          }
+        });
+      } catch (err) {
+        console.error("Error editing property:", err);
+      }
+    }
+
+    async function deleteProperty(id) {
+      if (!confirm("Are you sure to delete this property?")) return;
+      try {
+        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+        loadProperties();
+      } catch (err) {
+        console.error("Error deleting property:", err);
+      }
+    }
+
+    submitBtn.addEventListener("click", async () => {
+      const form = document.getElementById("propertyForm");
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const formData = gatherFormData();
+      try {
+        const res = await fetch(editId ? `${API_URL}/${editId}` : API_URL, {
+          method: editId ? "PUT" : "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        alert(data.message);
+        form.reset();
+        editId = null;
+        loadProperties();
+      } catch (err) {
+        console.error("Error saving property:", err);
+      }
+    });
+
+    // Load dropdowns
+    loadDropdown(CAT_URL, "category", "id", "category_name", "Select Category");
+    loadDropdown(
+      FEATURE_URL,
+      "feture_category",
+      "id",
+      "category_name",
+      "Select feture_category"
+    );
+    loadDropdown(
+      LOCATION_URL,
+      "location",
+      "id",
+      "location_name",
+      "Select Location"
+    );
+
+    // Load properties
+    loadProperties();
+  }
+
+  initPropertyPage();
+</script>
