@@ -3,16 +3,16 @@ const router = express.Router();
 const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
-const agentsController = require("../controllers/agentsController");
+const testimonialsController = require("../controllers/testimonialsController");
 
-// Ensure upload folder exists
+// Ensure folder exists
 const uploadDir = path.resolve(
   __dirname,
-  "../../../frontend/admin/uploads/agents"
+  "../../../frontend/admin/uploads/testimonials"
 );
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-// Multer config
+// Multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) =>
@@ -24,17 +24,16 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.test(file.mimetype) && allowed.test(ext)) cb(null, true);
-    else cb(new Error("Only image files allowed"));
+    if (allowed.test(file.mimetype)) cb(null, true);
+    else cb(new Error("Only image files allowed!"));
   },
 });
 
 // Routes
-router.get("/", agentsController.getAll);
-router.post("/", upload.single("image"), agentsController.create);
-router.put("/:id", upload.single("image"), agentsController.update);
-router.delete("/:id", agentsController.remove);
+router.get("/", testimonialsController.getAll);
+router.post("/", upload.single("image"), testimonialsController.create);
+router.put("/:id", upload.single("image"), testimonialsController.update);
+router.delete("/:id", testimonialsController.remove);
 
 // Error handling
 router.use((err, req, res, next) =>

@@ -10,13 +10,19 @@ const featureCategoryRoutes = require("./admin/routes/featurecategoryRoutes");
 const sliderRoutes = require("./admin/routes/sliderRoutes");
 const agentsRoutes = require("./admin/routes/agentsRoutes");
 const propertiesRoutes = require("./admin/routes/propertiesRoutes");
+// Location Routes
+const locationRoutes = require("./admin/routes/locationsRoutes");
+const testimonialsRoutes = require("./admin/routes/testimonialsRoutes");
+const propertyImagesRoutes = require("./admin/routes/propertyImagesRoutes");
 
 const app = express();
 
 // Middleware
 app.use(cors());
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
+app.use(express.urlencoded({ extended: true }));
 
 // Serve admin static files
 app.use("/admin", express.static(path.join(__dirname, "../frontend/admin")));
@@ -45,9 +51,20 @@ app.use("/feature-category", featureCategoryRoutes);
 app.use("/sliders", sliderRoutes);
 app.use("/agents", agentsRoutes);
 app.use("/properties", propertiesRoutes);
+app.use("/locations", locationRoutes);
+app.use("/testimonials", testimonialsRoutes);
+app.use("/property-images", propertyImagesRoutes);
 
 // Test route
 app.get("/", (req, res) => res.send("Server is running"));
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error("SERVER ERROR:", err);
+  res
+    .status(500)
+    .json({ success: false, message: "Server error", error: err.message });
+});
 
 const PORT = 5000;
 app.listen(PORT, () => {
