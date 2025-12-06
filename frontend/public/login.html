@@ -207,6 +207,18 @@
           msg.textContent = data.message || "Invalid username or password.";
         }
       }
+      // Trigger login() when Enter key is pressed
+      document
+        .getElementById("emailInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") login();
+        });
+
+      document
+        .getElementById("passwordInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") login();
+        });
     </script>
   </body>
 </html>

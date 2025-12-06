@@ -108,6 +108,7 @@
 
       <!-- Sidebar -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
         <a href="index.html" class="brand-link">
           <img
             src="dist/img/AdminLTELogo.png"
@@ -115,10 +116,12 @@
             class="brand-image img-circle elevation-3"
             style="opacity: 0.8"
           />
-          <span class="brand-text font-weight-light">Real Estate</span>
+          <span class="brand-text font-weight-light">REMS Mangemanet</span>
         </a>
 
-        <div class="sidebar">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column" style="height: 100%">
+          <!-- User Panel -->
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
               <img
@@ -128,11 +131,12 @@
               />
             </div>
             <div class="info">
-              <a href="#" class="d-block">Admin User</a>
+              <a href="#" class="d-block" id="sidebarUsername">Admin User</a>
             </div>
           </div>
 
-          <nav class="mt-2">
+          <!-- Sidebar Menu -->
+          <nav class="mt-2 flex-grow-1">
             <ul
               class="nav nav-pills nav-sidebar flex-column"
               data-widget="treeview"
@@ -175,14 +179,75 @@
                   <p>Sliders</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="agents.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Agents</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="properties.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Properties</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="property_images.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Property Images</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="location.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Location</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="#"
+                  class="nav-link sidebar-link"
+                  data-page="testimonials.html"
+                >
+                  <i class="nav-icon far fa-image"></i>
+                  <p>Testimonial</p>
+                </a>
+              </li>
             </ul>
           </nav>
+
+          <!-- Logout Button at the bottom -->
+          <div class="p-3">
+            <button
+              id="logoutBtn"
+              class="btn btn-danger btn-block"
+              style="width: 100%"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </aside>
 
       <!-- Content Wrapper -->
       <div class="content-wrapper p-4" id="mainContent">
-        <h3>Welcome to Real Estate Admin Dashboard</h3>
+        <h3 id="welcomeMsg">Welcome to Real Estate Admin Dashboard</h3>
         <p>Select an option from the sidebar to manage data.</p>
       </div>
 
@@ -199,11 +264,42 @@
     <script src="dist/js/adminlte.js"></script>
 
     <script>
+      // Fetch username from backend on page load
+      async function loadUsername() {
+        try {
+          const res = await fetch("/admin/user"); // backend endpoint to get current user
+          const data = await res.json();
+
+          const username =
+            data.success && data.username ? data.username : "Admin User";
+          document.getElementById(
+            "welcomeMsg"
+          ).textContent = `Welcome, ${username}!`;
+          document.getElementById("sidebarUsername").textContent = username;
+        } catch (err) {
+          console.error("Failed to load username:", err);
+        }
+      }
+
+      loadUsername();
+
+      // Logout button logic
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", async () => {
+          try {
+            await fetch("/logout", { method: "POST" }); // backend logout endpoint
+          } catch (err) {
+            console.error("Logout failed:", err);
+          }
+          window.location.href = "/index.html"; // redirect to public page
+        });
+
       $(document).ready(function () {
         function loadPage(page, addToHistory = true) {
           if (page === "home") {
             $("#mainContent").html(
-              "<h3>Welcome to Real Estate Admin Dashboard</h3><p>Select an option from the sidebar to manage data.</p>"
+              "<h3 id='welcomeMsg'>Welcome to Real Estate Admin Dashboard</h3><p>Select an option from the sidebar to manage data.</p>"
             );
             $(".sidebar-link").removeClass("active");
             $(".sidebar-link[data-page='home']").addClass("active");
@@ -212,7 +308,6 @@
             return;
           }
 
-          // Load content dynamically
           $("#mainContent").load(page, function (response, status, xhr) {
             if (status === "error") {
               $("#mainContent").html(
@@ -230,20 +325,17 @@
           }
         }
 
-        // Sidebar link click
         $(".sidebar-link").on("click", function (e) {
           e.preventDefault();
           const page = $(this).data("page");
           loadPage(page);
         });
 
-        // Home link click
         $("#homeLink").on("click", function (e) {
           e.preventDefault();
           loadPage("home");
         });
 
-        // Handle back/forward browser buttons
         window.onpopstate = function (event) {
           const page = event.state?.page || "home";
           loadPage(page, false);
@@ -251,22 +343,21 @@
 
         // On initial load, check URL path
         const path = window.location.pathname;
-        if (path.includes("/admin/category")) {
-          loadPage("category.html", false);
-        } else {
-          loadPage("home", false);
-        }
-
-        if (path.includes("/admin/feature-category")) {
+        if (path.includes("/admin/category")) loadPage("category.html", false);
+        else if (path.includes("/admin/feature-category"))
           loadPage("featurecategory.html", false);
-        } else {
-          loadPage("home", false);
-        }
-        if (path.includes("/admin/sliders")) {
-          loadPage("Sliders.html", false);
-        } else {
-          loadPage("home", false);
-        }
+        else if (path.includes("/admin/sliders"))
+          loadPage("sliders.html", false);
+        else if (path.includes("/admin/agents")) loadPage("agents.html", false);
+        else if (path.includes("/admin/properties"))
+          loadPage("properties.html", false);
+        else if (path.includes("/admin/property-images"))
+          loadPage("property_images.html", false);
+        else if (path.includes("/admin/locations"))
+          loadPage("location.html", false);
+        else if (path.includes("/admin/testimonials"))
+          loadPage("testimonials.html", false);
+        else loadPage("home", false);
       });
     </script>
   </body>

@@ -48,27 +48,27 @@
 
       <div class="col-md-4 mb-2">
         <label>Size</label>
-        <input type="text" id="Size" class="form-control" />
+        <input type="text" id="size" class="form-control" />
       </div>
 
       <div class="col-md-4 mb-2">
         <label>Bedrooms</label>
-        <input type="text" id="Bedrooms" class="form-control" />
+        <input type="text" id="bedrooms" class="form-control" />
       </div>
 
       <div class="col-md-4 mb-2">
         <label>Bathrooms</label>
-        <input type="text" id="Bathrooms" class="form-control" />
+        <input type="text" id="bathrooms" class="form-control" />
       </div>
 
       <div class="col-md-4 mb-2">
         <label>Kitchen</label>
-        <input type="text" id="Kitchen" class="form-control" />
+        <input type="text" id="kitchen" class="form-control" />
       </div>
 
       <div class="col-md-4 mb-2">
         <label>Year Built</label>
-        <input type="text" id="Year_built" class="form-control" />
+        <input type="text" id="year_built" class="form-control" />
       </div>
     </div>
 
@@ -77,47 +77,47 @@
     <!-- CHECKBOXES -->
     <div class="row">
       <div class="col-md-3">
-        <input type="checkbox" id="Garage" checked /> Garage
+        <input type="checkbox" id="garage" checked /> Garage
       </div>
-      <div class="col-md-3"><input type="checkbox" id="Heating" /> Heating</div>
+      <div class="col-md-3"><input type="checkbox" id="heating" /> Heating</div>
       <div class="col-md-3">
-        <input type="checkbox" id="Air_Conditioning" /> AC
+        <input type="checkbox" id="air_conditioning" /> AC
       </div>
       <div class="col-md-3">
-        <input type="checkbox" id="Wifi" checked /> Wifi
+        <input type="checkbox" id="wifi" checked /> Wifi
       </div>
 
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Security_Cameras" checked /> Security Cameras
+        <input type="checkbox" id="security_cameras" checked /> Security Cameras
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Cable_TV" checked /> Cable TV
+        <input type="checkbox" id="cable_tv" checked /> Cable TV
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Solar_Power" /> Solar Power
+        <input type="checkbox" id="solar_power" /> Solar Power
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Fireplace" checked /> Fireplace
+        <input type="checkbox" id="fireplace" checked /> Fireplace
       </div>
 
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Ventilation" checked /> Ventilation
+        <input type="checkbox" id="ventilation" checked /> Ventilation
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Internet" checked /> Internet
+        <input type="checkbox" id="internet" checked /> Internet
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Lift" checked /> Lift
+        <input type="checkbox" id="lift" checked /> Lift
       </div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Dishwasher" /> Dishwasher
+        <input type="checkbox" id="dishwasher" /> Dishwasher
       </div>
 
-      <div class="col-md-3 mt-2"><input type="checkbox" id="Pool" /> Pool</div>
+      <div class="col-md-3 mt-2"><input type="checkbox" id="pool" /> Pool</div>
       <div class="col-md-3 mt-2">
-        <input type="checkbox" id="Parking" checked /> Parking
+        <input type="checkbox" id="parking" checked /> Parking
       </div>
-      <div class="col-md-3 mt-2"><input type="checkbox" id="Gym" /> Gym</div>
+      <div class="col-md-3 mt-2"><input type="checkbox" id="gym" /> Gym</div>
     </div>
 
     <button type="button" id="submitBtn" class="btn btn-success mt-3">
@@ -142,203 +142,201 @@
 </div>
 
 <script>
+  const API_URL = "http://localhost:5000/properties";
+  let editId = null;
+
   async function loadDropdown(url, elementId, valueKey, textKey, placeholder) {
     try {
       const res = await fetch(url);
       const data = await res.json();
       const dropdown = document.getElementById(elementId);
       dropdown.innerHTML = `<option value="">${placeholder}</option>`;
-      (data.data || []).forEach((item) => {
+      data.data.forEach((item) => {
         dropdown.innerHTML += `<option value="${item[valueKey]}">${item[textKey]}</option>`;
       });
     } catch (err) {
-      console.error(`Error loading ${elementId}:`, err);
+      console.error("Dropdown Load Error:", err);
     }
   }
 
-  function initPropertyPage() {
-    const API_URL = "http://localhost:5000/properties";
-    const CAT_URL = "http://localhost:5000/category";
-    const FEATURE_URL = "http://localhost:5000/feature-category";
-    const LOCATION_URL = "http://localhost:5000/locations";
+  function gatherFormData() {
+    const fields = [
+      "property_title",
+      "price",
+      "category",
+      "feture_category",
+      "location",
+      "short_description",
+      "property_description",
+      "size",
+      "bedrooms",
+      "bathrooms",
+      "kitchen",
+      "year_built",
+    ];
 
-    let editId = null;
-    const tableBody = document.getElementById("propertyTable");
-    const submitBtn = document.getElementById("submitBtn");
+    const formData = new FormData();
 
-    async function loadProperties() {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        renderTable(data.data || []);
-      } catch (err) {
-        console.error("Error loading properties:", err);
+    fields.forEach((id) => {
+      const field = document.getElementById(id);
+      if (!field) return;
+
+      let value = field.value;
+      if (["category", "feture_category", "location"].includes(id)) {
+        value = value ? parseInt(value) : null;
       }
+      formData.append(id, value);
+    });
+
+    const checks = [
+      "garage",
+      "heating",
+      "air_conditioning",
+      "wifi",
+      "security_cameras",
+      "cable_tv",
+      "solar_power",
+      "fireplace",
+      "ventilation",
+      "internet",
+      "lift",
+      "dishwasher",
+      "pool",
+      "parking",
+      "gym",
+    ];
+
+    checks.forEach((id) => {
+      const check = document.getElementById(id);
+      if (check) formData.append(id, check.checked ? 1 : 0);
+    });
+
+    return formData;
+  }
+
+  async function loadProperties() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      renderTable(data.data);
+    } catch (err) {
+      console.error("Load properties error:", err);
+    }
+  }
+
+  function renderTable(properties) {
+    const tableBody = document.getElementById("propertyTable");
+    tableBody.innerHTML = "";
+
+    if (!properties.length) {
+      tableBody.innerHTML = `<tr><td colspan="7">No property found</td></tr>`;
+      return;
     }
 
-    function renderTable(properties) {
-      tableBody.innerHTML = "";
-      if (!properties.length) {
-        tableBody.innerHTML = `<tr><td colspan="7">No property found</td></tr>`;
-        return;
-      }
-      properties.forEach((p) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
+    properties.forEach((p) => {
+      const row = `
+      <tr>
         <td>${p.id}</td>
         <td>${p.property_title}</td>
         <td>${p.category_name}</td>
-        <td>${p.feture_category_name}</td>
+        <td>${p.feture_category}</td>
         <td>${p.price}</td>
         <td>${p.location_name}</td>
         <td>
           <button class="btn btn-warning btn-sm editBtn" data-id="${p.id}">Edit</button>
           <button class="btn btn-danger btn-sm deleteBtn" data-id="${p.id}">Delete</button>
-        </td>`;
-        tableBody.appendChild(row);
-      });
-
-      // Add event listeners for edit/delete
-      document
-        .querySelectorAll(".editBtn")
-        .forEach((btn) =>
-          btn.addEventListener("click", () => editProperty(btn.dataset.id))
-        );
-      document
-        .querySelectorAll(".deleteBtn")
-        .forEach((btn) =>
-          btn.addEventListener("click", () => deleteProperty(btn.dataset.id))
-        );
-    }
-
-    function gatherFormData() {
-      const formData = new FormData();
-      [
-        "property_title",
-        "price",
-        "category",
-        "feture_category",
-        "location",
-        "short_description",
-        "property_description",
-        "Size",
-        "Bedrooms",
-        "Bathrooms",
-        "Kitchen",
-        "Year_built",
-      ].forEach((id) => formData.append(id, document.getElementById(id).value));
-
-      [
-        "Garage",
-        "Heating",
-        "Air_Conditioning",
-        "Wifi",
-        "Security_Cameras",
-        "Cable_TV",
-        "Solar_Power",
-        "Fireplace",
-        "Ventilation",
-        "Internet",
-        "Lift",
-        "Dishwasher",
-        "Pool",
-        "Parking",
-        "Gym",
-      ].forEach((id) =>
-        formData.append(id, document.getElementById(id).checked ? 1 : 0)
-      );
-
-      return formData;
-    }
-
-    async function editProperty(id) {
-      try {
-        const res = await fetch(`${API_URL}/${id}`);
-        const data = await res.json();
-        const p = data.data;
-        editId = id;
-        Object.keys(p).forEach((key) => {
-          if (document.getElementById(key))
-            document.getElementById(key).value = p[key];
-          if (
-            [
-              "Garage",
-              "Heating",
-              "Air_Conditioning",
-              "Wifi",
-              "Security_Cameras",
-              "Cable_TV",
-              "Solar_Power",
-              "Fireplace",
-              "Ventilation",
-              "Internet",
-              "Lift",
-              "Dishwasher",
-              "Pool",
-              "Parking",
-              "Gym",
-            ].includes(key)
-          ) {
-            document.getElementById(key).checked = p[key] == 1;
-          }
-        });
-      } catch (err) {
-        console.error("Error editing property:", err);
-      }
-    }
-
-    async function deleteProperty(id) {
-      if (!confirm("Are you sure to delete this property?")) return;
-      try {
-        await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-        loadProperties();
-      } catch (err) {
-        console.error("Error deleting property:", err);
-      }
-    }
-
-    submitBtn.addEventListener("click", async () => {
-      const form = document.getElementById("propertyForm");
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-      const formData = gatherFormData();
-      try {
-        const res = await fetch(editId ? `${API_URL}/${editId}` : API_URL, {
-          method: editId ? "PUT" : "POST",
-          body: formData,
-        });
-        const data = await res.json();
-        alert(data.message);
-        form.reset();
-        editId = null;
-        loadProperties();
-      } catch (err) {
-        console.error("Error saving property:", err);
-      }
+        </td>
+      </tr>`;
+      tableBody.innerHTML += row;
     });
 
-    // Load dropdowns
-    loadDropdown(CAT_URL, "category", "id", "category_name", "Select Category");
-    loadDropdown(
-      FEATURE_URL,
-      "feture_category",
-      "id",
-      "category_name",
-      "Select feture_category"
-    );
-    loadDropdown(
-      LOCATION_URL,
-      "location",
-      "id",
-      "location_name",
-      "Select Location"
-    );
-
-    // Load properties
-    loadProperties();
+    document
+      .querySelectorAll(".editBtn")
+      .forEach((btn) =>
+        btn.addEventListener("click", () => editProperty(btn.dataset.id))
+      );
+    document
+      .querySelectorAll(".deleteBtn")
+      .forEach((btn) =>
+        btn.addEventListener("click", () => deleteProperty(btn.dataset.id))
+      );
   }
 
-  initPropertyPage();
+  async function editProperty(id) {
+    try {
+      const res = await fetch(`${API_URL}/${id}`);
+      const p = (await res.json()).data;
+      editId = id;
+
+      Object.keys(p).forEach((key) => {
+        const el = document.getElementById(key);
+        if (!el) return;
+
+        if (el.type === "checkbox") el.checked = p[key] == 1;
+        else el.value = p[key] ?? "";
+      });
+    } catch (err) {
+      console.error("Edit error:", err);
+    }
+  }
+
+  async function deleteProperty(id) {
+    if (!confirm("Are you sure to delete?")) return;
+    try {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      loadProperties();
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  }
+
+  document.getElementById("submitBtn").addEventListener("click", async () => {
+    const formData = gatherFormData();
+
+    const jsonData = {};
+    formData.forEach((value, key) => (jsonData[key] = value));
+
+    try {
+      const res = await fetch(editId ? `${API_URL}/${editId}` : API_URL, {
+        method: editId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(jsonData),
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+
+      alert(data.message);
+      document.getElementById("propertyForm").reset();
+      editId = null;
+      loadProperties();
+    } catch (err) {
+      console.error("Save property error:", err);
+      alert("Error saving property: " + err.message);
+    }
+  });
+
+  // Load dropdowns and table
+  loadDropdown(
+    "http://localhost:5000/properties/categories",
+    "category",
+    "id",
+    "category_name",
+    "Select Category"
+  );
+  loadDropdown(
+    "http://localhost:5000/properties/feature-categories",
+    "feture_category",
+    "id",
+    "category_name",
+    "Select Feature"
+  );
+  loadDropdown(
+    "http://localhost:5000/properties/locations",
+    "location",
+    "id",
+    "location_name",
+    "Select Location"
+  );
+  loadProperties();
 </script>

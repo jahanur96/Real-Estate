@@ -1,0 +1,207 @@
+<div class="container-fluid">
+  <h4 class="mb-3">Property Images Management</h4>
+
+  <form id="imageForm" class="mb-4" enctype="multipart/form-data" novalidate>
+    <div class="form-group mb-2">
+      <label>Select Property</label>
+      <select id="property_id" class="form-control" required></select>
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Choose Image(s)</label>
+      <input
+        type="file"
+        id="images"
+        class="form-control"
+        accept="image/*"
+        multiple
+        required
+      />
+    </div>
+
+    <div class="form-group mb-2">
+      <label>Image Type</label>
+      <select id="image_type" class="form-control" required>
+        <option value="1">Gallery</option>
+        <option value="2">Floor Plan</option>
+      </select>
+    </div>
+
+    <div class="form-check mb-3">
+      <input type="checkbox" id="status" class="form-check-input" checked />
+      <label for="status" class="form-check-label">Active</label>
+    </div>
+
+    <button type="button" id="submitBtn" class="btn btn-success">
+      Upload Images
+    </button>
+  </form>
+
+  <table class="table table-bordered table-striped text-center align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Property</th>
+        <th>Image</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="imageTable"></tbody>
+  </table>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+  async function initPropertyImages() {
+    const API_IMG = "http://localhost:5000/property-images";
+    const API_PROP = "http://localhost:5000/properties";
+
+    const tableBody = document.getElementById("imageTable");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Load property dropdown
+    async function loadProperties() {
+      try {
+        const res = await fetch(API_PROP);
+        const result = await res.json();
+
+        const select = document.getElementById("property_id");
+        select.innerHTML = `<option value="">Select Property</option>`;
+        result.data.forEach((p) => {
+          select.innerHTML += `<option value="${p.id}">${p.property_title}</option>`;
+        });
+      } catch (err) {
+        console.error(err);
+        toastr.error("Failed to load properties");
+      }
+    }
+
+    // Load images table
+    async function loadImages(property_id = "") {
+      try {
+        const url = property_id
+          ? `${API_IMG}/property/${property_id}`
+          : API_IMG;
+        const res = await fetch(url);
+        const result = await res.json();
+
+        if (!result.success)
+          throw new Error(result.message || "Failed to fetch");
+
+        renderTable(result.data);
+      } catch (err) {
+        console.error(err);
+        toastr.error(err.message);
+      }
+    }
+
+    // Render table
+    function renderTable(items) {
+      tableBody.innerHTML = "";
+      if (!items.length) {
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-muted">No images found.</td></tr>`;
+        return;
+      }
+
+      items.forEach((img) => {
+        const imgType = img.image_type == 1 ? "Gallery" : "Floor Plan";
+        const statusBadge =
+          img.status == 1
+            ? `<span class="badge bg-success">Active</span>`
+            : `<span class="badge bg-secondary">Inactive</span>`;
+        const propertyTitle = img.property_title || "-";
+        const imgSrc = img.image
+          ? `http://localhost:5000${img.image}`
+          : "https://via.placeholder.com/80x60?text=No+Image";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${img.id}</td>
+        <td>${propertyTitle}</td>
+        <td><img src="${imgSrc}" width="80" height="60" style="object-fit:cover;border-radius:6px;"></td>
+        <td>${imgType}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn btn-danger btn-sm deleteBtn">Delete</button>
+        </td>
+      `;
+
+        // Delete button
+        row.querySelector(".deleteBtn").addEventListener("click", async () => {
+          if (!confirm("Delete this image?")) return;
+          try {
+            const res = await fetch(`${API_IMG}/${img.id}`, {
+              method: "DELETE",
+            });
+            const data = await res.json();
+            if (!data.success)
+              throw new Error(data.message || "Failed to delete");
+            toastr.success(data.message);
+            loadImages(document.getElementById("property_id").value);
+          } catch (err) {
+            console.error(err);
+            toastr.error(err.message);
+          }
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Upload multiple images
+    submitBtn.addEventListener("click", async () => {
+      const form = document.getElementById("imageForm");
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const property_id = document.getElementById("property_id").value;
+      const image_type = document.getElementById("image_type").value;
+      const status = document.getElementById("status").checked ? 1 : 0;
+      const files = document.getElementById("images").files;
+
+      if (!property_id || files.length === 0) {
+        toastr.error("Select property and images");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("property_id", property_id);
+      formData.append("image_type", image_type);
+      formData.append("status", status);
+      for (let i = 0; i < files.length; i++)
+        formData.append("images", files[i]);
+
+      try {
+        const res = await fetch(API_IMG, { method: "POST", body: formData });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "Upload failed");
+
+        toastr.success(data.message);
+        form.reset();
+        loadImages(property_id);
+      } catch (err) {
+        console.error(err);
+        toastr.error(err.message);
+      }
+    });
+
+    // Reload images when property changes
+    document.getElementById("property_id").addEventListener("change", (e) => {
+      loadImages(e.target.value);
+    });
+
+    await loadProperties();
+    await loadImages();
+  }
+
+  initPropertyImages();
+</script>
