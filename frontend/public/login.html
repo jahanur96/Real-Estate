@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
   <head>
     <meta charset="utf-8" />
@@ -15,8 +15,6 @@
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
     />
 
     <style>
@@ -26,13 +24,11 @@
         padding: 0;
         font-family: "Poppins", sans-serif;
       }
-
       :root {
-        --primary: #00b894; /* index page এর main color */
+        --primary: #00b894;
         --muted: #f0f0f0;
         --text: #222;
       }
-
       body {
         min-height: 100vh;
         display: flex;
@@ -42,11 +38,10 @@
           135deg,
           rgba(240, 248, 255, 0.85),
           rgba(224, 255, 255, 0.85)
-        ); /* index page এর background এর মত */
+        );
         color: var(--text);
         padding: 24px;
       }
-
       .form-box {
         width: 100%;
         max-width: 400px;
@@ -55,12 +50,10 @@
         padding: 36px 32px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
       }
-
       .title-row {
         text-align: center;
         margin-bottom: 22px;
       }
-
       .title-row h1 {
         font-size: 24px;
         color: var(--primary);
@@ -69,7 +62,6 @@
         display: inline-block;
         padding-bottom: 8px;
       }
-
       .title-row h1::after {
         content: "";
         width: 36px;
@@ -79,11 +71,9 @@
         margin: 8px auto 0;
         border-radius: 3px;
       }
-
       form {
         width: 100%;
       }
-
       .input-field {
         background: var(--muted);
         border-radius: 8px;
@@ -94,7 +84,6 @@
         margin: 12px 0;
         transition: all 0.35s ease;
       }
-
       .input-field input {
         border: 0;
         outline: 0;
@@ -103,14 +92,12 @@
         font-size: 15px;
         padding: 8px 0;
       }
-
       .input-field i {
         color: rgba(0, 0, 0, 0.45);
         font-size: 18px;
         width: 20px;
         text-align: center;
       }
-
       .btn {
         width: 100%;
         height: 44px;
@@ -123,21 +110,13 @@
         transition: all 0.25s ease;
         margin-top: 16px;
       }
-
       .btn:hover {
-        background: #00d6a0; /* hover color index page এর shade অনুযায়ী */
+        background: #00d6a0;
       }
-
       #message {
         text-align: center;
         margin-top: 10px;
         font-size: 14px;
-      }
-
-      @media (max-width: 420px) {
-        .form-box {
-          padding: 26px 18px;
-        }
       }
     </style>
   </head>
@@ -186,39 +165,44 @@
           return;
         }
 
-        const res = await fetch("http://localhost:5000/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: username, password }),
-        });
+        try {
+          // আমরা সরাসরি রিলেটিভ পাথ ব্যবহার করছি কারণ আমরা পোর্ট 5000-এই থাকবো
+          const res = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: username, password }),
+          });
 
-        const data = await res.json();
+          const data = await res.json();
 
-        if (data.success) {
-          msg.style.color = "green";
-          msg.textContent = "Login successful! Redirecting...";
-          if (data.role === "admin") {
-            window.location.href = "http://localhost:5000/admin";
+          if (data.success) {
+            if (data.role === "admin") {
+              // 1. টোকেন localStorage এ সেভ করুন (আপনার অ্যাডমিন পেজের স্ক্রিপ্ট এটার দরকার)
+              localStorage.setItem("token", data.token);
+
+              // 2. ইউজার নেম সেভ করুন (ঐচ্ছিক)
+              if (data.name) localStorage.setItem("username", data.name);
+
+              msg.style.color = "green";
+              msg.textContent = "Login Successful! Redirecting...";
+
+              // 3. অ্যাডমিন রাউটে রিডাইরেক্ট করুন
+              setTimeout(() => {
+                window.location.href = "/admin";
+              }, 500);
+            } else {
+              alert("Access denied. You are not an admin.");
+            }
           } else {
-            window.location.href = "http://localhost:5000/admin/404.html";
+            msg.style.color = "red";
+            msg.textContent = data.message;
           }
-        } else {
+        } catch (err) {
+          console.error(err);
           msg.style.color = "red";
-          msg.textContent = data.message || "Invalid username or password.";
+          msg.textContent = "Server connection error!";
         }
       }
-      // Trigger login() when Enter key is pressed
-      document
-        .getElementById("emailInput")
-        .addEventListener("keypress", function (e) {
-          if (e.key === "Enter") login();
-        });
-
-      document
-        .getElementById("passwordInput")
-        .addEventListener("keypress", function (e) {
-          if (e.key === "Enter") login();
-        });
     </script>
   </body>
 </html>

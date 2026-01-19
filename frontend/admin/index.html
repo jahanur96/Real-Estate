@@ -1,14 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard</title>
 
+    <!-- Base URL for relative assets when using sub-paths like /admin/category -->
+    <base href="/admin/" />
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
-    <!-- AdminLTE -->
+    <!-- AdminLTE Theme style -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css" />
+    <!-- Google Font: Source Sans Pro -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
 
     <style>
       :root {
@@ -17,23 +25,13 @@
       }
       body {
         font-family: "Source Sans Pro", sans-serif;
-        background-color: #00b98e;
       }
-
-      /* Navbar */
+      /* Navbar Styling */
       .main-header.navbar {
         background-color: #ffffff;
         border-bottom: 2px solid var(--main-color);
       }
-      .navbar-light .navbar-nav .nav-link {
-        color: var(--text-color);
-        font-weight: 600;
-      }
-      .navbar-light .navbar-nav .nav-link:hover {
-        color: var(--main-color);
-      }
-
-      /* Sidebar */
+      /* Sidebar Styling */
       .main-sidebar {
         background-color: var(--main-color) !important;
       }
@@ -41,13 +39,11 @@
         background-color: #ffffff !important;
         color: var(--main-color) !important;
         font-weight: bold;
-      }
-      .brand-link .brand-text {
-        color: var(--main-color) !important;
+        border-bottom: 1px solid #eee;
       }
       .nav-sidebar .nav-link {
-        color: #eafaf6 !important;
-        font-weight: 500;
+        color: #ffffff !important;
+        margin-bottom: 5px;
       }
       .nav-sidebar .nav-link.active,
       .nav-sidebar .nav-link:hover {
@@ -56,36 +52,22 @@
         font-weight: 600;
       }
       .nav-icon {
-        color: #ffffff !important;
+        color: inherit !important;
       }
-
-      /* Content */
+      /* Content Area */
       .content-wrapper {
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        background-color: #f4f6f9;
+        min-height: calc(100vh - calc(3.5rem + 1px) - calc(3.5rem + 1px));
       }
-      h3 {
-        color: var(--text-color);
-        font-weight: 700;
+      .page-container {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
       }
-      p {
-        color: #555;
-      }
-
       /* Footer */
       .main-footer {
-        background-color: #ffffff;
         border-top: 2px solid var(--main-color);
-        color: var(--text-color);
-        font-weight: 500;
-      }
-      .main-footer a {
-        color: var(--main-color);
-        text-decoration: none;
-      }
-      .main-footer a:hover {
-        text-decoration: underline;
       }
     </style>
   </head>
@@ -96,31 +78,32 @@
       <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button">
-              <i class="fas fa-bars"></i>
-            </a>
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"
+              ><i class="fas fa-bars"></i
+            ></a>
           </li>
           <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link" id="homeLink">Home</a>
+            <a href="#" class="nav-link" id="homeLink">Dashboard Home</a>
           </li>
         </ul>
       </nav>
 
-      <!-- Sidebar -->
+      <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <!-- Brand Logo -->
-        <a href="index.html" class="brand-link">
+        <a href="/admin" class="brand-link">
           <img
             src="dist/img/AdminLTELogo.png"
-            alt="AdminLTE Logo"
+            alt="Logo"
             class="brand-image img-circle elevation-3"
             style="opacity: 0.8"
           />
-          <span class="brand-text font-weight-light">REMS Mangemanet</span>
+          <span class="brand-text">REMS Admin</span>
         </a>
 
-        <!-- Sidebar -->
-        <div class="sidebar d-flex flex-column" style="height: 100%">
+        <div
+          class="sidebar d-flex flex-column"
+          style="height: calc(100% - 3.5rem)"
+        >
           <!-- User Panel -->
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
@@ -131,7 +114,9 @@
               />
             </div>
             <div class="info">
-              <a href="#" class="d-block" id="sidebarUsername">Admin User</a>
+              <a href="#" class="d-block" id="sidebarUsername"
+                >Loading User...</a
+              >
             </div>
           </div>
 
@@ -149,13 +134,14 @@
                   <p>Home</p>
                 </a>
               </li>
+              <li class="nav-header">CONTENT MANAGEMENT</li>
               <li class="nav-item">
                 <a
                   href="#"
                   class="nav-link sidebar-link"
                   data-page="category.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-th-list"></i>
                   <p>Category</p>
                 </a>
               </li>
@@ -165,7 +151,7 @@
                   class="nav-link sidebar-link"
                   data-page="featurecategory.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-star"></i>
                   <p>Feature Category</p>
                 </a>
               </li>
@@ -175,7 +161,7 @@
                   class="nav-link sidebar-link"
                   data-page="sliders.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-images"></i>
                   <p>Sliders</p>
                 </a>
               </li>
@@ -185,7 +171,7 @@
                   class="nav-link sidebar-link"
                   data-page="agents.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-user-tie"></i>
                   <p>Agents</p>
                 </a>
               </li>
@@ -195,7 +181,7 @@
                   class="nav-link sidebar-link"
                   data-page="properties.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-building"></i>
                   <p>Properties</p>
                 </a>
               </li>
@@ -205,7 +191,7 @@
                   class="nav-link sidebar-link"
                   data-page="property_images.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-camera"></i>
                   <p>Property Images</p>
                 </a>
               </li>
@@ -215,7 +201,7 @@
                   class="nav-link sidebar-link"
                   data-page="location.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-map-marker-alt"></i>
                   <p>Location</p>
                 </a>
               </li>
@@ -225,34 +211,36 @@
                   class="nav-link sidebar-link"
                   data-page="testimonials.html"
                 >
-                  <i class="nav-icon far fa-image"></i>
+                  <i class="nav-icon fas fa-quote-left"></i>
                   <p>Testimonial</p>
                 </a>
               </li>
             </ul>
           </nav>
 
-          <!-- Logout Button at the bottom -->
+          <!-- Logout Section -->
           <div class="p-3">
-            <button
-              id="logoutBtn"
-              class="btn btn-danger btn-block"
-              style="width: 100%"
-            >
-              Logout
+            <button id="logoutBtn" class="btn btn-block btn-danger elevation-2">
+              <i class="fas fa-sign-out-alt"></i> Logout
             </button>
           </div>
         </div>
       </aside>
 
       <!-- Content Wrapper -->
-      <div class="content-wrapper p-4" id="mainContent">
-        <h3 id="welcomeMsg">Welcome to Real Estate Admin Dashboard</h3>
-        <p>Select an option from the sidebar to manage data.</p>
+      <div class="content-wrapper p-3">
+        <div id="mainContent" class="page-container">
+          <!-- Dynamic Content Loads Here -->
+          <h3>Welcome to Real Estate Admin Dashboard</h3>
+          <p>
+            Please select an option from the sidebar menu to start managing your
+            data.
+          </p>
+        </div>
       </div>
 
-      <!-- Footer -->
       <footer class="main-footer">
+        <div class="float-right d-none d-sm-inline">REMS v1.0</div>
         <strong>Copyright &copy; 2025 <a href="#">Development Team</a>.</strong>
         All rights reserved.
       </footer>
@@ -264,43 +252,39 @@
     <script src="dist/js/adminlte.js"></script>
 
     <script>
-      // Fetch username from backend on page load
-      async function loadUsername() {
-        try {
-          const res = await fetch("/admin/user"); // backend endpoint to get current user
-          const data = await res.json();
-
-          const username =
-            data.success && data.username ? data.username : "Admin User";
-          document.getElementById(
-            "welcomeMsg"
-          ).textContent = `Welcome, ${username}!`;
-          document.getElementById("sidebarUsername").textContent = username;
-        } catch (err) {
-          console.error("Failed to load username:", err);
-        }
-      }
-
-      loadUsername();
-
-      // Logout button logic
-      document
-        .getElementById("logoutBtn")
-        .addEventListener("click", async () => {
-          try {
-            await fetch("/logout", { method: "POST" }); // backend logout endpoint
-          } catch (err) {
-            console.error("Logout failed:", err);
-          }
-          window.location.href = "/index.html"; // redirect to public page
-        });
-
       $(document).ready(function () {
+        // --- 1. SESSION CHECK ---
+        const token = localStorage.getItem("token");
+        if (!token) {
+          window.location.href = "/login.html";
+          return;
+        }
+
+        // --- 2. LOAD USER DATA ---
+        async function loadUserData() {
+          try {
+            const res = await fetch("/auth/user-profile", {
+              // Adjusted to match typical auth routes
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            if (data.success) {
+              $("#sidebarUsername").text(data.user.name || "Admin User");
+            }
+          } catch (err) {
+            console.error("Failed to load user info:", err);
+            $("#sidebarUsername").text("Admin User");
+          }
+        }
+        loadUserData();
+
+        // --- 3. PAGE LOADING ENGINE ---
         function loadPage(page, addToHistory = true) {
-          if (page === "home") {
-            $("#mainContent").html(
-              "<h3 id='welcomeMsg'>Welcome to Real Estate Admin Dashboard</h3><p>Select an option from the sidebar to manage data.</p>"
-            );
+          if (!page || page === "home") {
+            $("#mainContent").html(`
+          <h3>Welcome to Real Estate Admin Dashboard</h3>
+          <p>Hello Admin! Use the sidebar to manage your website content.</p>
+        `);
             $(".sidebar-link").removeClass("active");
             $(".sidebar-link[data-page='home']").addClass("active");
             if (addToHistory)
@@ -310,54 +294,80 @@
 
           $("#mainContent").load(page, function (response, status, xhr) {
             if (status === "error") {
-              $("#mainContent").html(
-                `<p style="color:red;">Failed to load page: ${xhr.status} ${xhr.statusText}</p>`
-              );
+              $("#mainContent").html(`
+            <div class="alert alert-danger">
+              <h5><i class="icon fas fa-ban"></i> Error!</h5>
+              Failed to load <b>${page}</b>. Status: ${xhr.status} ${xhr.statusText}
+            </div>
+          `);
             }
           });
 
+          // Update UI state
           $(".sidebar-link").removeClass("active");
           $(`.sidebar-link[data-page='${page}']`).addClass("active");
 
           if (addToHistory) {
-            const url = page.replace(".html", "");
-            history.pushState({ page }, null, "/admin/" + url);
+            const urlSlug = page.replace(".html", "").replace("_", "-");
+            history.pushState({ page: page }, null, "/admin/" + urlSlug);
           }
         }
 
+        // --- 4. EVENT LISTENERS ---
+
+        // Sidebar Navigation
         $(".sidebar-link").on("click", function (e) {
           e.preventDefault();
-          const page = $(this).data("page");
-          loadPage(page);
+          loadPage($(this).data("page"));
         });
 
+        // Top Home Link
         $("#homeLink").on("click", function (e) {
           e.preventDefault();
           loadPage("home");
         });
 
+        // Logout logic
+        $("#logoutBtn").on("click", async function () {
+          try {
+            // Optional: Call server-side logout to clear cookies/session
+            await fetch("/auth/logout", { method: "POST" });
+          } catch (e) {
+            console.log(
+              "Logout request failed, cleaning local storage anyway.",
+            );
+          }
+
+          localStorage.removeItem("token");
+          window.location.href = "/login.html";
+        });
+
+        // Browser Back/Forward buttons support
         window.onpopstate = function (event) {
-          const page = event.state?.page || "home";
+          const page = event.state ? event.state.page : "home";
           loadPage(page, false);
         };
 
-        // On initial load, check URL path
+        // --- 5. INITIAL ROUTE HANDLING ---
         const path = window.location.pathname;
-        if (path.includes("/admin/category")) loadPage("category.html", false);
-        else if (path.includes("/admin/feature-category"))
-          loadPage("featurecategory.html", false);
-        else if (path.includes("/admin/sliders"))
-          loadPage("sliders.html", false);
-        else if (path.includes("/admin/agents")) loadPage("agents.html", false);
-        else if (path.includes("/admin/properties"))
-          loadPage("properties.html", false);
-        else if (path.includes("/admin/property-images"))
-          loadPage("property_images.html", false);
-        else if (path.includes("/admin/locations"))
-          loadPage("location.html", false);
-        else if (path.includes("/admin/testimonials"))
-          loadPage("testimonials.html", false);
-        else loadPage("home", false);
+        const segment = path.split("/").pop();
+
+        const routeMap = {
+          category: "category.html",
+          featurecategory: "featurecategory.html",
+          sliders: "sliders.html",
+          agents: "agents.html",
+          properties: "properties.html",
+          "property-images": "property_images.html",
+          location: "location.html",
+          testimonials: "testimonials.html",
+        };
+
+        if (routeMap[segment]) {
+          loadPage(routeMap[segment], false);
+        } else if (segment === "admin" || segment === "") {
+          loadPage("home", false);
+        }
       });
     </script>
   </body>
