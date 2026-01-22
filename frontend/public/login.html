@@ -166,7 +166,6 @@
         }
 
         try {
-          // আমরা সরাসরি রিলেটিভ পাথ ব্যবহার করছি কারণ আমরা পোর্ট 5000-এই থাকবো
           const res = await fetch("/auth/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -177,16 +176,13 @@
 
           if (data.success) {
             if (data.role === "admin") {
-              // 1. টোকেন localStorage এ সেভ করুন (আপনার অ্যাডমিন পেজের স্ক্রিপ্ট এটার দরকার)
               localStorage.setItem("token", data.token);
 
-              // 2. ইউজার নেম সেভ করুন (ঐচ্ছিক)
               if (data.name) localStorage.setItem("username", data.name);
 
               msg.style.color = "green";
               msg.textContent = "Login Successful! Redirecting...";
 
-              // 3. অ্যাডমিন রাউটে রিডাইরেক্ট করুন
               setTimeout(() => {
                 window.location.href = "/admin";
               }, 500);
