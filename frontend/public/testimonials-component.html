@@ -1,0 +1,96 @@
+<div class="container-fluid py-5">
+  <div class="container">
+    <div class="text-center mx-auto mb-5" style="max-width: 600px">
+      <h1 class="mb-3">Our Clients Say!</h1>
+      <p>
+        Our clients love the service we provide. Here is what they have to say.
+      </p>
+    </div>
+
+    <div class="owl-carousel testimonial-carousel" id="testimonialContainer">
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const API_BASE = "http://localhost:5000";
+
+    async function initTestimonials() {
+      // 1. Robust check for OwlCarousel on the global window object
+      const $globalJquery = window.jQuery || window.$;
+
+      if (!$globalJquery || !$globalJquery.fn.owlCarousel) {
+        console.warn("OwlCarousel plugin not found, retrying...");
+        setTimeout(initTestimonials, 200);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/testimonials`);
+        const result = await response.json();
+
+        // Select container using global jQuery instance
+        const $container = $globalJquery("#testimonialContainer");
+
+        if (result.success && result.data && result.data.length > 0) {
+          let htmlContent = "";
+
+          result.data.forEach((item) => {
+            let imageUrl = item.image
+              ? item.image.startsWith("http")
+                ? item.image
+                : `${API_BASE}${item.image}`
+              : "img/testimonial-1.jpg";
+
+            htmlContent += `
+                            <div class="testimonial-item bg-light rounded p-3">
+                                <div class="bg-white border rounded p-4">
+                                    <p>${item.details || "Great service!"}</p>
+                                    <div class="d-flex align-items-center">
+                                        <img class="img-fluid flex-shrink-0 rounded" 
+                                             src="${imageUrl}" 
+                                             style="width: 45px; height: 45px; object-fit: cover;" 
+                                             onerror="this.src='img/testimonial-1.jpg'">
+                                        <div class="ps-3">
+                                            <h6 class="fw-bold mb-1">${item.client_name}</h6>
+                                            <small>${item.profession || "Client"}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+          });
+
+          // Inject HTML
+          $container.html(htmlContent);
+
+          // 2. Initialize using the global instance
+          $container.owlCarousel({
+            autoplay: true,
+            smartSpeed: 1000,
+            margin: 24,
+            dots: false,
+            loop: true,
+            nav: true,
+            navText: [
+              '<i class="bi bi-arrow-left"></i>',
+              '<i class="bi bi-arrow-right"></i>',
+            ],
+            responsive: {
+              0: { items: 1 },
+              992: { items: 2 },
+            },
+          });
+          console.log("Testimonial Carousel Initialized Successfully.");
+        }
+      } catch (error) {
+        console.error("Testimonial Fetch Error:", error);
+      }
+    }
+
+    initTestimonials();
+  })();
+</script>

@@ -8,7 +8,7 @@ exports.getCategories = (req, res) => {
       if (err)
         return res.status(500).json({ success: false, message: err.message });
       res.json({ success: true, data: result.rows });
-    }
+    },
   );
 };
 
@@ -19,7 +19,7 @@ exports.getFeatureCategories = (req, res) => {
       if (err)
         return res.status(500).json({ success: false, message: err.message });
       res.json({ success: true, data: result.rows });
-    }
+    },
   );
 };
 
@@ -30,26 +30,35 @@ exports.getLocations = (req, res) => {
       if (err)
         return res.status(500).json({ success: false, message: err.message });
       res.json({ success: true, data: result.rows });
-    }
+    },
   );
 };
 
 // CRUD
 exports.getAll = (req, res) => {
   const sql = `
-    SELECT p.id, p.property_title, p.price,
-           c.category_name,
-           f.category_name AS feture_category,
-           l.location_name
+    SELECT 
+      p.id, 
+      p.property_title, 
+      p.price, 
+      p.size, 
+      p.bedrooms, 
+      p.bathrooms, 
+      p.feture_category AS feture_category_id,
+      c.category_name, 
+      f.category_name AS feture_category_name,
+      f.is_special,
+      l.location_name
     FROM properties p
-    LEFT JOIN category c ON p.category=c.id
-    LEFT JOIN feture_category f ON p.feture_category=f.id
-    LEFT JOIN locations l ON p.location=l.id
+    LEFT JOIN category c ON p.category = c.id
+    LEFT JOIN feture_category f ON p.feture_category = f.id
+    LEFT JOIN locations l ON p.location = l.id
     ORDER BY p.id DESC
   `;
   db.query(sql, (err, result) => {
-    if (err)
+    if (err) {
       return res.status(500).json({ success: false, message: err.message });
+    }
     res.json({ success: true, data: result.rows });
   });
 };
@@ -62,7 +71,7 @@ exports.getById = (req, res) => {
       if (err)
         return res.status(500).json({ success: false, message: err.message });
       res.json({ success: true, data: result.rows[0] });
-    }
+    },
   );
 };
 

@@ -42,14 +42,10 @@ app.use("/locations", locationRoutes);
 app.use("/testimonials", testimonialsRoutes);
 app.use("/property-images", propertyImagesRoutes);
 
-// --- ADMIN DASHBOARD ROUTE (The Protector) ---
-// 1. মূল অ্যাডমিন HTML ফাইল সার্ভ করা (verifyToken দিয়ে প্রোটেক্টেড)
 app.get("/admin", verifyToken, isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/admin/index.html"));
 });
 
-// 2. অ্যাডমিন প্যানেলের ভিতরের ফাইলগুলো (CSS, JS, Pages) সার্ভ করা
-// এটি জরুরি, কারণ admin/index.html এর ভিতর থেকে 'dist/css/adminlte.min.css' কল করা হয়
 app.use(
   "/admin",
   verifyToken,
@@ -58,7 +54,6 @@ app.use(
 );
 
 // --- ROOT ROUTE ---
-// কেউ শুধু '/' এ হিট করলে লগইন পেজে পাঠাবে
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/public/login.html"));
 });

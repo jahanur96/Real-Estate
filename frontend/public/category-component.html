@@ -1,0 +1,87 @@
+<div class="container-fluid py-5">
+  <div class="container">
+    <div class="text-center mx-auto mb-5" style="max-width: 600px">
+      <h1 class="mb-3">Property Types</h1>
+      <p>
+        Explore our wide range of properties categorized by type to find exactly
+        what you need.
+      </p>
+    </div>
+    <div class="row g-4" id="categoryContainer">
+      <div class="col-12 text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    // Backend API URL
+    const API_BASE = "http://localhost:5000";
+
+    /**
+     * Fetches category data and renders it into the DOM
+     */
+    async function fetchCategories() {
+      try {
+        const response = await fetch(`${API_BASE}/category`);
+        const result = await response.json();
+
+        // Since your API returns a direct Array, we handle it here
+        const categories = Array.isArray(result) ? result : result.data;
+
+        const container = $("#categoryContainer");
+
+        if (categories && categories.length > 0) {
+          // Clear the loading spinner
+          container.empty();
+
+          categories.forEach((cat, index) => {
+            // Create a staggered animation delay (0.1s to 0.7s)
+            const delays = ["0.1s", "0.3s", "0.5s", "0.7s"];
+            const delay = delays[index % 4];
+
+            // Column Mapping: Using 'image' and 'name' from your API result
+            const iconUrl = cat.image
+              ? cat.image.startsWith("http")
+                ? cat.image
+                : `${API_BASE}${cat.image}`
+              : "img/icon-apartment.png"; // Fallback icon
+
+            const catHtml = `
+                            <div class="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="${delay}">
+                                <a class="cat-item d-block bg-light text-center rounded p-3" href="property-list.html?category=${cat.slug}">
+                                    <div class="rounded p-4">
+                                        <div class="icon mb-3">
+                                            <img class="img-fluid" src="${iconUrl}" alt="${cat.name}" 
+                                                 style="width: 64px; height: 64px; object-fit: contain;"
+                                                 onerror="this.src='img/icon-apartment.png'">
+                                        </div>
+                                        <h6>${cat.name}</h6>
+                                        <span>Check Properties</span>
+                                    </div>
+                                </a>
+                            </div>`;
+            container.append(catHtml);
+          });
+
+          // Re-initialize WOW.js animations for the newly added elements
+          if (typeof WOW === "function") {
+            new WOW().init();
+          }
+        } else {
+          container.html('<p class="text-center">No categories found.</p>');
+        }
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        $("#categoryContainer").html(
+          '<p class="text-center text-danger">Failed to load categories. Please check your connection.</p>',
+        );
+      }
+    }
+
+    // Initialize the fetch process
+    fetchCategories();
+  })();
+</script>

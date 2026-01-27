@@ -1,0 +1,118 @@
+<div class="container-fluid header bg-white p-0">
+  <div class="row g-0 align-items-center flex-column-reverse flex-md-row">
+    <div class="col-md-6 p-5 mt-lg-5">
+      <h1 class="display-5 animated fadeIn mb-4" id="static-title">
+        Loading...
+      </h1>
+      <p class="animated fadeIn mb-4 pb-2" id="static-description">
+        Please wait while we fetch the latest properties.
+      </p>
+      <a
+        href="#"
+        id="static-btn"
+        class="btn btn-primary py-3 px-5 me-3 animated fadeIn"
+        >Get Started</a
+      >
+    </div>
+
+    <div class="col-md-6 animated fadeIn">
+      <div
+        id="headerCarouselContainer"
+        class="owl-carousel header-carousel"
+      ></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const API_BASE = "http://localhost:5000";
+    let sliderData = []; // To store data for text updates
+
+    async function initHeaderSlider() {
+      const $globalJquery = window.jQuery || window.$;
+
+      if (!$globalJquery || !$globalJquery.fn.owlCarousel) {
+        setTimeout(initHeaderSlider, 200);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/sliders`);
+        const result = await response.json();
+        sliderData = Array.isArray(result) ? result : result.data;
+
+        if (sliderData && sliderData.length > 0) {
+          // Sort priority
+          sliderData.sort((a, b) =>
+            a.poirity === 1 ? -1 : b.poirity === 1 ? 1 : 0,
+          );
+
+          // Build ONLY images for the carousel
+          let carouselHtml = "";
+          sliderData.forEach((item) => {
+            const imageUrl = item.image.startsWith("http")
+              ? item.image
+              : `${API_BASE}${item.image}`;
+            carouselHtml += `
+                            <div class="owl-carousel-item">
+                                <img class="img-fluid w-100" src="${imageUrl}" style="max-height: 500px; object-fit: cover;">
+                            </div>`;
+          });
+
+          const $container = $globalJquery("#headerCarouselContainer");
+          $container.html(carouselHtml);
+
+          // Initialize Carousel
+          $container.owlCarousel({
+            autoplay: true,
+            smartSpeed: 1500,
+            items: 1,
+            dots: true,
+            loop: true,
+            nav: true,
+            navText: [
+              '<i class="bi bi-chevron-left"></i>',
+              '<i class="bi bi-chevron-right"></i>',
+            ],
+            // Triggered every time the slide changes
+            onChanged: function (event) {
+              if (!event.item) return;
+
+              // Calculate current index (Owl loop adds extra items, so we use relative index)
+              const index =
+                event.item.index - event.relatedTarget._clones.length / 2;
+              const actualIndex =
+                index < 0 ? sliderData.length - 1 : index % sliderData.length;
+
+              updateStaticText(actualIndex);
+            },
+          });
+
+          // Set initial text
+          updateStaticText(0);
+        }
+      } catch (err) {
+        console.error("Slider Error:", err);
+      }
+    }
+
+    function updateStaticText(index) {
+      const item = sliderData[index];
+      if (!item) return;
+
+      const $ = window.jQuery || window.$;
+
+      // Apply text with a quick fade animation for smoothness
+      $("#static-title").fadeOut(200, function () {
+        $(this).html(item.title).fadeIn(200);
+      });
+      $("#static-description").fadeOut(200, function () {
+        $(this).text(item.short_description).fadeIn(200);
+      });
+      $("#static-btn").attr("href", item.url || "#");
+    }
+
+    initHeaderSlider();
+  })();
+</script>

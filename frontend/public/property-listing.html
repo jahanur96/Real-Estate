@@ -1,0 +1,180 @@
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="row g-0 gx-5 align-items-end">
+      <div class="col-lg-6">
+        <div class="text-start mx-auto mb-5">
+          <h1 class="mb-3">Property Listing</h1>
+          <p>
+            Discover our latest properties managed with transparency and
+            efficiency.
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-6 text-start text-lg-end">
+        <ul
+          class="nav nav-pills d-inline-flex justify-content-end mb-5"
+          id="featureCategoryTab"
+        ></ul>
+      </div>
+    </div>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show p-0 active">
+        <div class="row g-4" id="propertyListContainer">
+          <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const API_BASE = "http://localhost:5000";
+    let globalProperties = [];
+    let globalImages = [];
+
+    async function initPropertySection() {
+      try {
+        const [featRes, propRes, imgRes] = await Promise.all([
+          fetch(`${API_BASE}/feature-category`), // Tomar deya controller endpoint
+          fetch(`${API_BASE}/properties`),
+          fetch(`${API_BASE}/property-images`),
+        ]);
+
+        // Tomar controller sorasori array return korche results.rows diye
+        const features = await featRes.json();
+
+        const propData = await propRes.json();
+        globalProperties = propData.data || []; // Properties wrap kora success:true te
+
+        const imgData = await imgRes.json();
+        globalImages = imgData.data || [];
+
+        // 1. Render all category tabs (For Sell, For Rent)
+        renderFeatureTabs(features);
+
+        // 2. Default Select: Jei category-r is_special == 1 seta active hobe
+        const specialCategory = features.find((f) => f.is_special === 1);
+
+        if (specialCategory) {
+          // Automaticaly filter and select the special one
+          filterProperties(specialCategory.id);
+          $(`[data-filter="${specialCategory.id}"]`).addClass("active");
+        } else {
+          // Fallback: Jodi special na pay tobe 'All' dekhabe
+          renderProperties(globalProperties);
+          $('[data-filter="all"]').addClass("active");
+        }
+
+        setupFilterEvents();
+      } catch (error) {
+        console.error("Error loading data:", error);
+        $("#propertyListContainer").html(
+          '<p class="text-danger text-center">Data fetch failure.</p>',
+        );
+      }
+    }
+
+    function renderFeatureTabs(features) {
+      let tabsHtml = `
+                <li class="nav-item me-2">
+                    <a class="btn btn-outline-primary" data-bs-toggle="pill" href="javascript:void(0)" data-filter="all">All</a>
+                </li>`;
+
+      // Protiti individual category tab create hobe
+      features.forEach((cat) => {
+        tabsHtml += `
+                    <li class="nav-item me-2">
+                        <a class="btn btn-outline-primary" data-bs-toggle="pill" href="javascript:void(0)" data-filter="${cat.id}">
+                            ${cat.category_name}
+                        </a>
+                    </li>`;
+      });
+      $("#featureCategoryTab").html(tabsHtml);
+    }
+
+    function setupFilterEvents() {
+      $("#featureCategoryTab").on("click", "a", function () {
+        const filterId = $(this).attr("data-filter");
+
+        $("#featureCategoryTab a").removeClass("active");
+        $(this).addClass("active");
+
+        filterProperties(filterId);
+      });
+    }
+
+    function filterProperties(filterId) {
+      if (filterId === "all") {
+        renderProperties(globalProperties);
+      } else {
+        // feture_category_id (ID match) filter
+        const filtered = globalProperties.filter(
+          (p) => p.feture_category_id == filterId,
+        );
+        renderProperties(filtered);
+      }
+    }
+
+    function renderProperties(properties) {
+      let propHtml = "";
+      if (properties.length === 0) {
+        $("#propertyListContainer").html(
+          '<div class="col-12 text-center py-5"><h5>No properties available for this category.</h5></div>',
+        );
+        return;
+      }
+
+      properties.forEach((prop) => {
+        const activeImg = globalImages.find(
+          (img) =>
+            img.property_id === prop.id &&
+            img.image_type === 1 &&
+            img.status === 1,
+        );
+        let imgPath = activeImg
+          ? activeImg.image.startsWith("http")
+            ? activeImg.image
+            : `${API_BASE}${activeImg.image}`
+          : "img/placeholder.jpg";
+
+        propHtml += `
+                <div class="col-lg-4 col-md-6">
+                    <div class="property-item rounded overflow-hidden shadow-sm bg-white border">
+                        <div class="position-relative overflow-hidden">
+                            <a href="#"><img class="img-fluid w-100" src="${imgPath}" style="height: 250px; object-fit: cover;"></a>
+                            <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">
+                                ${prop.feture_category_name || "Featured"}
+                            </div>
+                            <div class="bg-white rounded text-primary position-absolute start-0 bottom-0 mx-4 mb-4 py-1 px-3 shadow-sm">
+                                ${prop.category_name || "Property"}
+                            </div>
+                        </div>
+                        <div class="p-4 pb-0">
+                            <h5 class="text-primary mb-3">$${prop.price || "0"}</h5>
+                            <a class="d-block h5 mb-2" href="#">${prop.property_title || ""}</a>
+                            <p><i class="fa fa-map-marker-alt text-primary me-2"></i>${prop.location_name || ""}</p>
+                        </div>
+                        <div class="d-flex border-top text-secondary">
+                            <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-ruler-combined text-primary me-2"></i>${prop.size || 0} Sqft
+                            </small>
+                            <small class="flex-fill text-center border-end py-2">
+                                <i class="fa fa-bed text-primary me-2"></i>${prop.bedrooms || 0} Bed
+                            </small>
+                            <small class="flex-fill text-center py-2">
+                                <i class="fa fa-bath text-primary me-2"></i>${prop.bathrooms || 0} Bath
+                            </small>
+                        </div>
+                    </div>
+                </div>`;
+      });
+      $("#propertyListContainer").html(propHtml);
+    }
+
+    initPropertySection();
+  })();
+</script>
