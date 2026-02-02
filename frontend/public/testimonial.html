@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Real Estate HTML Template</title>
+    <title>Testimonial | Real Estate HTML Template</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="keywords" />
     <meta content="" name="description" />
@@ -42,27 +42,19 @@
   <body>
     <div class="container-fluid bg-white p-0">
       <!-- Spinner Start -->
-      <div
-        id="spinner"
-        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
-      >
-        <div
-          class="spinner-border text-primary"
-          style="width: 3rem; height: 3rem"
-          role="status"
-        >
+      <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center" >
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem" role="status" >
           <span class="sr-only">Loading...</span>
         </div>
       </div>
       <!-- Spinner End -->
 
       <!-- Navbar Start -->
-      <div class="container-fluid nav-bar bg-transparent">
+      <div id="dynamic-header-placeholder"></div>
+
+      <!-- <div class="container-fluid nav-bar bg-transparent">
         <nav class="navbar navbar-expand-lg bg-white navbar-light py-0 px-4">
-          <a
-            href="index.html"
-            class="navbar-brand d-flex align-items-center text-center"
-          >
+          <a href="index.html" class="navbar-brand d-flex align-items-center text-center" >
             <div class="icon p-2 me-2">
               <img
                 class="img-fluid"
@@ -125,7 +117,8 @@
             </div>
           </div>
         </nav>
-      </div>
+      </div> -->
+
       <!-- Navbar End -->
 
       <!-- Header Start -->
@@ -154,21 +147,13 @@
       <!-- Header End -->
 
       <!-- Search Start -->
-      <div
-        class="container-fluid bg-primary mb-5 wow fadeIn"
-        data-wow-delay="0.1s"
-        style="padding: 35px"
-      >
+      <div class="container-fluid bg-primary mb-5 wow fadeIn" data-wow-delay="0.1s" style="padding: 35px" >
         <div class="container">
           <div class="row g-2">
             <div class="col-md-10">
               <div class="row g-2">
                 <div class="col-md-4">
-                  <input
-                    type="text"
-                    class="form-control border-0 py-3"
-                    placeholder="Search Keyword"
-                  />
+                  <input type="text" class="form-control border-0 py-3" placeholder="Search Keyword" />
                 </div>
                 <div class="col-md-4">
                   <select class="form-select border-0 py-3">
@@ -197,7 +182,10 @@
       <!-- Search End -->
 
       <!-- Testimonial Start -->
-      <div class="container-fluid py-5">
+       
+      <div id="dynamic-testimonials-placeholder"></div>
+
+      <!-- <div class="container-fluid py-5">
         <div class="container">
           <div
             class="text-center mx-auto mb-5 wow fadeInUp"
@@ -277,11 +265,14 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+
       <!-- Testimonial End -->
 
       <!-- Footer Start -->
-      <div
+      <div id="dynamic-footer-placeholder"></div>
+
+      <!-- <div
         class="container-fluid bg-dark text-white-50 footer pt-5 mt-5 wow fadeIn"
         data-wow-delay="0.1s"
       >
@@ -415,51 +406,42 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
       <!-- Footer End -->
 
       <!-- Back to Top -->
-      <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"
-        ><i class="bi bi-arrow-up"></i
-      ></a>
+      <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top" ><i class="bi bi-arrow-up"></i ></a>
     </div>
 
     <!-- JavaScript Libraries -->
     <script data-cfasync="false" src="js/email-decode.min.js"></script>
-    <script
-      src="js/code.jquery.com/jquery-3.4.1.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="js/bootstrap%405.0.0/dist/js/bootstrap.bundle.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="lib/wow/wow.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="lib/easing/easing.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="lib/waypoints/waypoints.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="lib/owlcarousel/owl.carousel.min.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap%405.0.0/dist/js/bootstrap.bundle.min.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
+    <script src="lib/wow/wow.min.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
+    <script src="lib/easing/easing.min.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
+    <script src="lib/waypoints/waypoints.min.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
 
     <!-- Template Javascript -->
-    <script
-      src="js/main.js"
-      type="8f826a2c9d6d770c80164fbe-text/javascript"
-    ></script>
-    <script
-      src="js/rocket-loader.min.js"
-      data-cf-settings="8f826a2c9d6d770c80164fbe-|49"
-      defer
-    ></script>
+    <script src="js/main.js" type="8f826a2c9d6d770c80164fbe-text/javascript" ></script>
+    <script src="js/rocket-loader.min.js" data-cf-settings="8f826a2c9d6d770c80164fbe-|49" defer ></script>
+    
+    <script>
+      $(function () {
+        // load external file
+        $("#dynamic-header-placeholder").load("navbar-component.html");
+        $("#dynamic-testimonials-placeholder").load(
+          "testimonials-component.html",
+        );
+        $("#dynamic-footer-placeholder").load("footer-component.html",
+          function () {
+            // Optional: Re-initialize WOW.js if the footer has animations
+            if (typeof WOW === "function") {
+              new WOW().init();
+            }
+          },
+        );
+      });
+    </script>
   </body>
 </html>
