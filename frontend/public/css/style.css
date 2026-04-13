@@ -125,6 +125,11 @@
   color: var(--primary);
 }
 
+.navbar-light .navbar-nav .nav-link.active {
+  color: #00b98e !important; /* Tomar primary color */
+  font-weight: 600;
+}
+
 @media (max-width: 991.98px) {
   .nav-bar {
     margin: 0;
@@ -450,4 +455,22 @@
   margin-right: 0;
   padding-right: 0;
   border-right: none;
+}
+/* Style for the Feature Category Badge */
+.prop-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #00b98e; /* Use your primary color */
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  z-index: 10;
+  text-transform: uppercase;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-item {
+  position: relative; /* Necessary to position the badge absolute */
 }

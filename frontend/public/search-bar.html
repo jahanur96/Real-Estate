@@ -1,0 +1,105 @@
+<div
+  class="container-fluid bg-primary mb-5 wow fadeIn"
+  data-wow-delay="0.1s"
+  style="padding: 35px"
+>
+  <div class="container">
+    <div class="row g-2">
+      <div class="col-md-10">
+        <div class="row g-2">
+          <div class="col-md-4">
+            <input
+              type="text"
+              id="searchKeyword"
+              class="form-control border-0 py-3"
+              placeholder="Search Keyword"
+            />
+          </div>
+          <div class="col-md-4">
+            <select id="searchCategory" class="form-select border-0 py-3">
+              <option selected value="">Property Type</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <select id="searchLocation" class="form-select border-0 py-3">
+              <option selected value="">Location</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <button id="searchBtn" class="btn btn-dark border-0 w-100 py-3">
+          Search
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function loadFilters() {
+    try {
+      const [catRes, locRes] = await Promise.all([
+        fetch("http://localhost:5000/category"),
+        fetch("http://localhost:5000/locations"),
+      ]);
+
+      const categoriesData = await catRes.json();
+      const locationsData = await locRes.json();
+
+      // Backend jodi { data: [...] } pathay athoba sorasori [...] pathay - duibhabei handle hobe
+      const categories = Array.isArray(categoriesData)
+        ? categoriesData
+        : categoriesData.data || [];
+      const locations = Array.isArray(locationsData)
+        ? locationsData
+        : locationsData.data || [];
+
+      // 1. Property Type (Category) Dropdown Load
+      const catSelect = $("#searchCategory");
+      catSelect.empty().append('<option value="">Property Type</option>');
+      categories.forEach((cat) => {
+        // Tomar admin code onujayi 'cat.name' kaj korche, tai eitai safe
+        const displayName = cat.name || cat.category_name || "Unknown Type";
+        catSelect.append(`<option value="${cat.id}">${displayName}</option>`);
+      });
+
+      // 2. Location Dropdown Load
+      const locSelect = $("#searchLocation");
+      locSelect.empty().append('<option value="">Location</option>');
+      locations.forEach((loc) => {
+        const locName = loc.location_name || loc.name || "Unknown Location";
+        locSelect.append(`<option value="${loc.id}">${locName}</option>`);
+      });
+    } catch (err) {
+      console.error("Filter loading failed:", err);
+    }
+  }
+
+  // Function call
+  loadFilters();
+
+  // --- Search Button Click Logic ---
+  $("#searchBtn").on("click", function () {
+    // Input IDs gulo HTML-er sathe match thakte hobe
+    const keyword = $("#searchKeyword").val();
+    const category = $("#searchCategory").val();
+    const location = $("#searchLocation").val();
+
+    let query = new URLSearchParams();
+
+    if (keyword && keyword.trim() !== "") {
+      query.append("keyword", keyword.trim());
+    }
+    if (category && category !== "") {
+      query.append("category", category);
+    }
+    if (location && location !== "") {
+      query.append("location", location);
+    }
+
+    // Redirect to listing page
+    const finalUrl = `property-list.html?${query.toString()}`;
+    window.location.href = finalUrl;
+  });
+</script>

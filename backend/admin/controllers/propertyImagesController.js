@@ -81,19 +81,23 @@ exports.createMultiple = (req, res) => {
         (err, result) => {
           if (err) reject(err);
           else resolve(result.rows[0].id);
-        }
+        },
       );
     });
   });
 
   Promise.all(promises)
     .then((ids) =>
-      res.json({ success: true, message: "Images uploaded successfully", ids })
+      res.json({ success: true, message: "Images uploaded successfully", ids }),
     )
     .catch((err) =>
       res
         .status(500)
-        .json({ success: false, message: "Database error", error: err.message })
+        .json({
+          success: false,
+          message: "Database error",
+          error: err.message,
+        }),
     );
 };
 
@@ -149,7 +153,7 @@ exports.updateMultiple = (req, res) => {
                 (err, result) => {
                   if (err) reject(err);
                   else resolve(result.rows[0].id);
-                }
+                },
               );
             });
           });
@@ -160,18 +164,18 @@ exports.updateMultiple = (req, res) => {
                 success: true,
                 message: "Images updated successfully",
                 ids,
-              })
+              }),
             )
             .catch((err) =>
               res.status(500).json({
                 success: false,
                 message: "Database error",
                 error: err.message,
-              })
+              }),
             );
-        }
+        },
       );
-    }
+    },
   );
 };
 
@@ -204,7 +208,7 @@ exports.remove = (req, res) => {
         if (img) deleteFile(img);
         res.json({ success: true, message: "Image deleted successfully" });
       });
-    }
+    },
   );
 };
 
@@ -241,8 +245,8 @@ exports.removeByProperty = (req, res) => {
             success: true,
             message: "All images for this property deleted",
           });
-        }
+        },
       );
-    }
+    },
   );
 };

@@ -8,6 +8,7 @@ router.get("/feature-categories", propertyController.getFeatureCategories);
 router.get("/locations", propertyController.getLocations);
 
 // CRUD
+router.get("/search", propertyController.search);
 router.get("/", propertyController.getAll);
 router.get("/:id", propertyController.getById);
 router.post("/", propertyController.create);

@@ -1,5 +1,61 @@
 const db = require("../../db");
 
+// Search Properties Logic
+exports.search = (req, res) => {
+  const { category, location, keyword } = req.query;
+
+  let sql = `
+    SELECT 
+      p.id, 
+      p.property_title, 
+      p.price, 
+      p.size, 
+      p.bedrooms, 
+      p.bathrooms, 
+      p.feture_category,
+      c.category_name, 
+      l.location_name
+    FROM properties p
+    LEFT JOIN category c ON p.category = c.id
+    LEFT JOIN locations l ON p.location = l.id
+    WHERE 1=1
+  `;
+
+  const values = [];
+  let count = 1;
+
+  // Category filter (Dropdown value)
+  if (category && category !== "") {
+    sql += ` AND p.category = $${count}`;
+    values.push(parseInt(category));
+    count++;
+  }
+
+  // Location filter (Dropdown value)
+  if (location && location !== "") {
+    sql += ` AND p.location = $${count}`;
+    values.push(parseInt(location));
+    count++;
+  }
+
+  // Keyword filter (Input text)
+  if (keyword && keyword !== "") {
+    sql += ` AND (p.property_title ILIKE $${count} OR p.short_description ILIKE $${count})`;
+    values.push(`%${keyword}%`);
+    count++;
+  }
+
+  sql += " ORDER BY p.id DESC";
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Search Error:", err.message);
+      return res.status(500).json({ success: false, message: err.message });
+    }
+    res.json({ success: true, data: result.rows });
+  });
+};
+
 // Dropdowns
 exports.getCategories = (req, res) => {
   db.query(

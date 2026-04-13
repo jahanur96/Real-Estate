@@ -24,13 +24,36 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <div class="navbar-nav ms-auto">
-        <a href="index.html" class="nav-item nav-link active">Home</a>
+        <a href="index.html" class="nav-item nav-link">Home</a>
         <a href="about.html" class="nav-item nav-link">About</a>
         <a href="property-list.html" class="nav-item nav-link">Property</a>
         <a href="testimonial.html" class="nav-item nav-link">Testimonial</a>
         <a href="contact.html" class="nav-item nav-link">Contact</a>
-        <a href="login.html" class="nav-item nav-link btn">Login</a>
+        <a href="login.html" class="nav-item nav-link btn d-none">Login</a>
       </div>
     </div>
   </nav>
 </div>
+<script>
+  $(document).ready(function () {
+    // Current page-er path khuje ber koro
+    var currentPath = window.location.pathname.split("/").pop();
+
+    // Jodi path khali thake (mane root domain), tobe index.html dhore nao
+    if (currentPath === "") {
+      currentPath = "index.html";
+    }
+
+    // Protiti nav-link check koro
+    $(".navbar-nav .nav-link").each(function () {
+      var href = $(this).attr("href");
+
+      // Jodi href current path-er sathe match kore
+      if (currentPath === href) {
+        $(this).addClass("active");
+      } else {
+        $(this).removeClass("active");
+      }
+    });
+  });
+</script>

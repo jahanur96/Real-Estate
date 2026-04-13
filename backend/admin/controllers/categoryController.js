@@ -36,7 +36,7 @@ exports.create = (req, res) => {
     const newId = result.rows.length > 0 ? result.rows[0].id : null;
     res.json({
       success: true,
-      message: "✅ Category added successfully!",
+      message: " Category added successfully!",
       id: newId,
     });
   });

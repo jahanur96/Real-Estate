@@ -31,150 +31,185 @@
 </div>
 
 <script>
-  (function () {
-    const API_BASE = "http://localhost:5000";
-    let globalProperties = [];
-    let globalImages = [];
+  const API_BASE = "http://localhost:5000";
 
-    async function initPropertySection() {
-      try {
-        const [featRes, propRes, imgRes] = await Promise.all([
-          fetch(`${API_BASE}/feature-category`), // Tomar deya controller endpoint
-          fetch(`${API_BASE}/properties`),
-          fetch(`${API_BASE}/property-images`),
-        ]);
+  /**
+   * window.loadProperties: Loads data based on category slug or search parameters.
+   * This is accessible globally so the main page can call it.
+   */
+  window.loadProperties = async function (categorySlug = null) {
+    const container = $("#propertyListContainer");
 
-        // Tomar controller sorasori array return korche results.rows diye
-        const features = await featRes.json();
+    // Show a loading spinner while fetching data
+    container.html(
+      '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>',
+    );
 
-        const propData = await propRes.json();
-        globalProperties = propData.data || []; // Properties wrap kora success:true te
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
 
-        const imgData = await imgRes.json();
-        globalImages = imgData.data || [];
-
-        // 1. Render all category tabs (For Sell, For Rent)
-        renderFeatureTabs(features);
-
-        // 2. Default Select: Jei category-r is_special == 1 seta active hobe
-        const specialCategory = features.find((f) => f.is_special === 1);
-
-        if (specialCategory) {
-          // Automaticaly filter and select the special one
-          filterProperties(specialCategory.id);
-          $(`[data-filter="${specialCategory.id}"]`).addClass("active");
-        } else {
-          // Fallback: Jodi special na pay tobe 'All' dekhabe
-          renderProperties(globalProperties);
-          $('[data-filter="all"]').addClass("active");
+      // 1. Resolve Slug to ID: Backend search expects an ID, so we convert the slug first
+      if (categorySlug) {
+        const catRes = await fetch(`${API_BASE}/category`);
+        const cats = await catRes.json();
+        // Adjust based on your controller returning results.rows directly or wrapped in .data
+        const categoryList = Array.isArray(cats) ? cats : cats.data || [];
+        const matched = categoryList.find((c) => c.slug === categorySlug);
+        if (matched) {
+          urlParams.set("category", matched.id);
         }
-
-        setupFilterEvents();
-      } catch (error) {
-        console.error("Error loading data:", error);
-        $("#propertyListContainer").html(
-          '<p class="text-danger text-center">Data fetch failure.</p>',
-        );
       }
+
+      // 2. Determine Endpoint: Use /search if parameters exist, otherwise get all
+      let finalUrl = urlParams.toString()
+        ? `${API_BASE}/properties/search?${urlParams.toString()}`
+        : `${API_BASE}/properties`;
+
+      // 3. Parallel Fetching: Get categories, properties, and images at once for speed
+      const [featRes, propRes, imgRes] = await Promise.all([
+        fetch(`${API_BASE}/feature-category`),
+        fetch(finalUrl),
+        fetch(`${API_BASE}/property-images`),
+      ]);
+
+      const features = await featRes.json();
+      const propData = await propRes.json();
+      const imgData = await imgRes.json();
+
+      // Normalize data structure from backend responses
+      const properties = propData.data || propData || [];
+      const images = imgData.data || imgData || [];
+      const featureList = Array.isArray(features)
+        ? features
+        : features.data || [];
+
+      // 4. Render UI Components
+      renderFeatureTabs(featureList);
+      renderProperties(properties, images);
+
+      // 5. Initialize internal filtering for Tabs (For Sale, For Rent, etc.)
+      setupFilterEvents(properties, images);
+    } catch (error) {
+      console.error("Critical Load Error:", error);
+      container.html(
+        '<div class="col-12 text-center py-5"><p class="text-danger">Failed to load properties. Please check your connection.</p></div>',
+      );
+    }
+  };
+
+  /**
+   * Renders the Feature Category Tabs (e.g., All, Residential, Commercial)
+   */
+  function renderFeatureTabs(features) {
+    let tabsHtml = `<li class="nav-item me-2"><a class="btn btn-outline-primary active" data-bs-toggle="pill" href="javascript:void(0)" data-filter="all">All</a></li>`;
+
+    features.forEach((cat) => {
+      tabsHtml += `
+        <li class="nav-item me-2">
+            <a class="btn btn-outline-primary" data-bs-toggle="pill" href="javascript:void(0)" data-filter="${cat.id}">
+                ${cat.category_name}
+            </a>
+        </li>`;
+    });
+    $("#featureCategoryTab").html(tabsHtml);
+  }
+
+  /**
+   * Renders Property Cards.
+   * Fixes the $NaN issue by ensuring price is treated as a Number.
+   */
+  function renderProperties(properties, images) {
+    const container = $("#propertyListContainer");
+    if (!properties || properties.length === 0) {
+      container.html(
+        '<div class="col-12 text-center py-5"><h3>No properties found matching your criteria.</h3></div>',
+      );
+      return;
     }
 
-    function renderFeatureTabs(features) {
-      let tabsHtml = `
-                <li class="nav-item me-2">
-                    <a class="btn btn-outline-primary" data-bs-toggle="pill" href="javascript:void(0)" data-filter="all">All</a>
-                </li>`;
+    let html = "";
+    properties.forEach((p) => {
+      // Find the main image (image_type === 1)
+      const activeImg = images.find(
+        (img) =>
+          Number(img.property_id) === Number(p.id) &&
+          Number(img.image_type) === 1,
+      );
+      const imgPath = activeImg
+        ? activeImg.image.startsWith("http")
+          ? activeImg.image
+          : `${API_BASE}${activeImg.image}`
+        : "img/placeholder.jpg";
 
-      // Protiti individual category tab create hobe
-      features.forEach((cat) => {
-        tabsHtml += `
-                    <li class="nav-item me-2">
-                        <a class="btn btn-outline-primary" data-bs-toggle="pill" href="javascript:void(0)" data-filter="${cat.id}">
-                            ${cat.category_name}
-                        </a>
-                    </li>`;
-      });
-      $("#featureCategoryTab").html(tabsHtml);
-    }
+      // Safe Price Parsing: Prevents $NaN if data is missing or malformed
+      const rawPrice = p.price
+        ? p.price.toString().replace(/[^0-9.]/g, "")
+        : "0";
+      const formattedPrice = Number(rawPrice).toLocaleString("en-US");
 
-    function setupFilterEvents() {
-      $("#featureCategoryTab").on("click", "a", function () {
+      html += `
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="property-item rounded border h-100 shadow-sm bg-white overflow-hidden">
+                <div class="position-relative">
+                    <a href="property-details.html?id=${p.id}">
+                        <img class="img-fluid w-100" src="${imgPath}" alt="${p.property_title}" style="height:240px; object-fit:cover;">
+                    </a>
+                    <div class="bg-primary text-white position-absolute top-0 start-0 m-3 py-1 px-3 rounded">
+                        ${p.category_name || "Listing"}
+                    </div>
+                </div>
+                <div class="p-4">
+                    <h5 class="text-primary mb-3">$${formattedPrice}</h5>
+                    <a class="d-block h5 mb-2 text-dark text-decoration-none" href="property-details.html?id=${p.id}">
+                        ${p.property_title}
+                    </a>
+                    <p><i class="fa fa-map-marker-alt text-primary me-2"></i>${p.location_name || "Location"}</p>
+                </div>
+                <div class="d-flex border-top text-secondary">
+                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-ruler-combined text-primary me-2"></i>${p.size || 0} Sqft</small>
+                    <small class="flex-fill text-center border-end py-2"><i class="fa fa-bed text-primary me-2"></i>${p.bedrooms || 0} Bed</small>
+                    <small class="flex-fill text-center py-2"><i class="fa fa-bath text-primary me-2"></i>${p.bathrooms || 0} Bath</small>
+                </div>
+            </div>
+        </div>`;
+    });
+    container.html(html);
+  }
+
+  /**
+   * Handles click events on Feature Tabs for internal filtering
+   */
+  function setupFilterEvents(properties, images) {
+    $("#featureCategoryTab")
+      .off("click")
+      .on("click", "a", function () {
         const filterId = $(this).attr("data-filter");
-
         $("#featureCategoryTab a").removeClass("active");
         $(this).addClass("active");
 
-        filterProperties(filterId);
+        // Filter by the feture_category ID returned by your search controller
+        const filtered =
+          filterId === "all"
+            ? properties
+            : properties.filter(
+                (p) =>
+                  Number(p.feture_category) === Number(filterId) ||
+                  Number(p.feture_category_id) === Number(filterId),
+              );
+
+        renderProperties(filtered, images);
       });
+  }
+
+  /**
+   * Automatic execution if accessed directly without category slug in URL
+   */
+  $(document).ready(function () {
+    if (
+      $("#propertyListContainer").length &&
+      !window.location.search.includes("category=")
+    ) {
+      window.loadProperties();
     }
-
-    function filterProperties(filterId) {
-      if (filterId === "all") {
-        renderProperties(globalProperties);
-      } else {
-        // feture_category_id (ID match) filter
-        const filtered = globalProperties.filter(
-          (p) => p.feture_category_id == filterId,
-        );
-        renderProperties(filtered);
-      }
-    }
-
-    function renderProperties(properties) {
-      let propHtml = "";
-      if (properties.length === 0) {
-        $("#propertyListContainer").html(
-          '<div class="col-12 text-center py-5"><h5>No properties available for this category.</h5></div>',
-        );
-        return;
-      }
-
-      properties.forEach((prop) => {
-        const activeImg = globalImages.find(
-          (img) =>
-            img.property_id === prop.id &&
-            img.image_type === 1 &&
-            img.status === 1,
-        );
-        let imgPath = activeImg
-          ? activeImg.image.startsWith("http")
-            ? activeImg.image
-            : `${API_BASE}${activeImg.image}`
-          : "img/placeholder.jpg";
-
-        propHtml += `
-                <div class="col-lg-4 col-md-6">
-                    <div class="property-item rounded overflow-hidden shadow-sm bg-white border">
-                        <div class="position-relative overflow-hidden">
-                            <a href="#"><img class="img-fluid w-100" src="${imgPath}" style="height: 250px; object-fit: cover;"></a>
-                            <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">
-                                ${prop.feture_category_name || "Featured"}
-                            </div>
-                            <div class="bg-white rounded text-primary position-absolute start-0 bottom-0 mx-4 mb-4 py-1 px-3 shadow-sm">
-                                ${prop.category_name || "Property"}
-                            </div>
-                        </div>
-                        <div class="p-4 pb-0">
-                            <h5 class="text-primary mb-3">$${prop.price || "0"}</h5>
-                            <a class="d-block h5 mb-2" href="#">${prop.property_title || ""}</a>
-                            <p><i class="fa fa-map-marker-alt text-primary me-2"></i>${prop.location_name || ""}</p>
-                        </div>
-                        <div class="d-flex border-top text-secondary">
-                            <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-ruler-combined text-primary me-2"></i>${prop.size || 0} Sqft
-                            </small>
-                            <small class="flex-fill text-center border-end py-2">
-                                <i class="fa fa-bed text-primary me-2"></i>${prop.bedrooms || 0} Bed
-                            </small>
-                            <small class="flex-fill text-center py-2">
-                                <i class="fa fa-bath text-primary me-2"></i>${prop.bathrooms || 0} Bath
-                            </small>
-                        </div>
-                    </div>
-                </div>`;
-      });
-      $("#propertyListContainer").html(propHtml);
-    }
-
-    initPropertySection();
-  })();
+  });
 </script>

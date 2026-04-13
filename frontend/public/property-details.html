@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>- Real Estate HTML Template</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="keywords" />
+    <meta content="" name="description" />
+
+    <!-- Favicon -->
+    <link href="img/favicon.html" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&amp;family=Inter:wght@700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icon Font Stylesheet -->
+    <link
+      href="js/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="js/bootstrap-icons%401.4.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet" />
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div class="container-fluid bg-white p-0">
+      <!-- Spinner Start -->
+      <div
+        id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+      >
+        <div
+          class="spinner-border text-primary"
+          style="width: 3rem; height: 3rem"
+          role="status"
+        >
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+      <!-- Spinner End -->
+
+      <!-- Navbar Start -->
+      <div id="dynamic-navbar-placeholder"></div>
+      <!-- Navbar End -->
+
+      <!-- Header Start -->
+      <div id="dynamic-header-placeholder"></div>
+      <!-- Header End -->
+
+      <!-- Search Start -->
+      <div id="search-bar-placeholder"></div>
+      <!-- Search End -->
+
+      <!-- Property Detail Start -->
+      <div class="container-xxl py-5">
+        <div class="container">
+          <div class="row g-5">
+            <div class="col-lg-12">
+              <div
+                id="detail-carousel"
+                class="carousel slide mb-4 shadow rounded overflow-hidden"
+                data-bs-ride="carousel"
+              >
+                <div class="carousel-inner" id="property-gallery"></div>
+                <button
+                  class="carousel-control-prev"
+                  type="button"
+                  data-bs-target="#detail-carousel"
+                  data-bs-slide="prev"
+                >
+                  <span
+                    class="carousel-control-prev-icon"
+                    aria-hidden="true"
+                  ></span>
+                </button>
+                <button
+                  class="carousel-control-next"
+                  type="button"
+                  data-bs-target="#detail-carousel"
+                  data-bs-slide="next"
+                >
+                  <span
+                    class="carousel-control-next-icon"
+                    aria-hidden="true"
+                  ></span>
+                </button>
+              </div>
+
+              <div
+                class="d-flex align-items-center justify-content-between mb-3"
+              >
+                <h1 class="mb-0" id="prop-title">Loading Title...</h1>
+                <h3 class="text-primary mb-0" id="prop-price">$0</h3>
+              </div>
+              <p class="mb-4">
+                <i class="fa fa-map-marker-alt text-primary me-2"></i>
+                <span id="prop-location">Loading Location...</span>
+              </p>
+
+              <h4 class="mb-3">Short Description</h4>
+              <p class="mb-4" id="prop-short-desc"></p>
+
+              <h4 class="mb-3">Full Description</h4>
+              <p class="mb-5" id="prop-description"></p>
+
+              <h4 class="mb-3">Property Overview</h4>
+              <div class="bg-light rounded p-4 mb-5">
+                <div class="row g-4">
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-ruler-combined fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Size</p>
+                        <h6 class="mb-0" id="prop-size">0 sqft</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-bed fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Bedrooms</p>
+                        <h6 class="mb-0" id="prop-bedrooms">0 Bed</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-bath fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Bathrooms</p>
+                        <h6 class="mb-0" id="prop-bathrooms">0 Bath</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-utensils fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Kitchen</p>
+                        <h6 class="mb-0" id="prop-kitchen">0</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-car fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Garage</p>
+                        <h6 class="mb-0" id="prop-garage">No</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-4">
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-calendar-alt fa-2x text-primary"></i>
+                      <div class="ps-3">
+                        <p class="mb-0">Year Built</p>
+                        <h6 class="mb-0" id="prop-year">N/A</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <h4 class="mb-3">Property Utilities</h4>
+              <div class="bg-light rounded p-4 mb-5">
+                <div class="row g-4" id="utility-list"></div>
+              </div>
+
+              <h4 class="mb-3">Floor Plan</h4>
+              <div class="bg-light rounded p-4 mb-5">
+                <div class="row g-4" id="floor-plan-gallery"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Property Detail End -->
+
+      <!-- Footer Start -->
+      <div id="dynamic-footer-placeholder"></div>
+      <!-- Footer End -->
+
+      <!-- Back to Top -->
+      <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"
+        ><i class="bi bi-arrow-up"></i
+      ></a>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script data-cfasync="false" src="js/email-decode.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script
+      src="js/bootstrap%405.0.0/dist/js/bootstrap.bundle.min.js"
+      type="text/javascript"
+    ></script>
+    <script src="lib/wow/wow.min.js" type="text/javascript"></script>
+    <script src="lib/easing/easing.min.js" type="text/javascript"></script>
+    <script
+      src="lib/waypoints/waypoints.min.js"
+      type="text/javascript"
+    ></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js" type="text/javascript"></script>
+    <script src="js/rocket-loader.min.js" data-cf-settings="49" defer></script>
+
+    <script>
+      $(function () {
+        // External file load korbe
+        $("#dynamic-navbar-placeholder").load("navbar-component.html");
+
+        $("#dynamic-header-placeholder").load("header-component.html");
+        $("#search-bar-placeholder").load("search-bar.html");
+
+        $("#dynamic-footer-placeholder").load(
+          "footer-component.html",
+          function () {
+            // Optional: Re-initialize WOW.js if the footer has animations
+            if (typeof WOW === "function") {
+              new WOW().init();
+            }
+          },
+        );
+      });
+
+      $(document).ready(function () {
+        const API_BASE = "http://localhost:5000";
+        const urlParams = new URLSearchParams(window.location.search);
+        const propertyId = urlParams.get("id");
+
+        if (!propertyId) return;
+
+        async function loadDetails() {
+          try {
+            // 1. Fetch all data. Note: using "/feature-category" to match your backend
+            const [propRes, imgRes, locRes, featRes] = await Promise.all([
+              fetch(`${API_BASE}/properties/${propertyId}`),
+              fetch(`${API_BASE}/property-images/property/${propertyId}`),
+              fetch(`${API_BASE}/locations`),
+              fetch(`${API_BASE}/feature-category`),
+            ]);
+
+            // Convert all to JSON
+            const propResult = await propRes.json();
+            const imgResult = await imgRes.json();
+            const locResult = await locRes.json();
+            const featResult = await featRes.json();
+
+            if (propResult.success) {
+              const p = propResult.data;
+
+              // --- Handle Feature Category Badge (e.g., For Sale / For Rent) ---
+              let badgeHtml = "";
+              // featResult is the array from your controller (results.rows)
+              if (Array.isArray(featResult)) {
+                const featureObj = featResult.find(
+                  (f) => f.id === p.feture_category,
+                );
+                if (featureObj) {
+                  badgeHtml = `<div class="prop-badge">${featureObj.category_name}</div>`;
+                }
+              }
+
+              // --- Populate Text Fields ---
+              $("#prop-title").text(p.property_title);
+              $("#prop-price").text(`$${p.price}`);
+              $("#prop-short-desc").text(p.short_description);
+              $("#prop-description").text(p.property_description);
+
+              // --- Map Location ID to Name ---
+              if (locResult.success) {
+                const locationObj = locResult.data.find(
+                  (l) => l.id === p.location,
+                );
+                $("#prop-location").text(
+                  locationObj ? locationObj.location_name : "Unknown Location",
+                );
+              }
+
+              // --- Populate Property Overview ---
+              $("#prop-size").text(`${p.size} sqft`);
+              $("#prop-bedrooms").text(`${p.bedrooms} Bed`);
+              $("#prop-bathrooms").text(`${p.bathrooms} Bath`);
+              $("#prop-kitchen").text(`${p.kitchen} Kitchen`);
+              $("#prop-garage").text(p.garage === 1 ? "Yes" : "No");
+              $("#prop-year").text(p.year_built);
+
+              // --- Generate Utilities List (All 14 fields) ---
+              const utilities = [
+                { name: "Heating", val: p.heating, icon: "fa-fire" },
+                {
+                  name: "Air Conditioning",
+                  val: p.air_conditioning,
+                  icon: "fa-snowflake",
+                },
+                { name: "Wifi", val: p.wifi, icon: "fa-wifi" },
+                {
+                  name: "Security Cameras",
+                  val: p.security_cameras,
+                  icon: "fa-video",
+                },
+                { name: "Cable TV", val: p.cable_tv, icon: "fa-tv" },
+                { name: "Solar Power", val: p.solar_power, icon: "fa-sun" },
+                { name: "Fireplace", val: p.fireplace, icon: "fa-fire-alt" },
+                { name: "Ventilation", val: p.ventilation, icon: "fa-wind" },
+                { name: "Internet", val: p.internet, icon: "fa-globe" },
+                { name: "Lift/Elevator", val: p.lift, icon: "fa-arrow-up" },
+                { name: "Dishwasher", val: p.dishwasher, icon: "fa-tint" },
+                { name: "Swimming Pool", val: p.pool, icon: "fa-swimmer" },
+                { name: "Parking", val: p.parking, icon: "fa-parking" },
+                { name: "Gym", val: p.gym, icon: "fa-dumbbell" },
+              ];
+
+              let utilHtml = "";
+              utilities.forEach((u) => {
+                utilHtml += `
+            <div class="col-md-4 col-6 border-bottom py-2 d-flex justify-content-between">
+                <span><i class="fa ${u.icon} text-primary me-2"></i>${u.name}</span>
+                <span class="fw-bold text-dark">${u.val === 1 ? "Yes" : "No"}</span>
+            </div>`;
+              });
+              $("#utility-list").html(utilHtml);
+
+              // --- Image Rendering (Gallery & Floor Plan) ---
+              if (imgResult.success) {
+                let galleryHtml = "";
+                let floorHtml = "";
+                let galleryCount = 0;
+
+                imgResult.data.forEach((img) => {
+                  const imgUrl = img.image.startsWith("http")
+                    ? img.image
+                    : `${API_BASE}${img.image}`;
+
+                  if (img.image_type === 1) {
+                    // Gallery Item with Badge on the first image
+                    galleryHtml += `
+                <div class="carousel-item ${galleryCount === 0 ? "active" : ""}">
+                    ${galleryCount === 0 ? badgeHtml : ""} 
+                    <img src="${imgUrl}" class="d-block w-100" style="height:500px; object-fit:cover;" alt="Property">
+                </div>`;
+                    galleryCount++;
+                  } else if (img.image_type === 2) {
+                    // Floor Plan Item
+                    floorHtml += `
+                <div class="col-md-6 mb-3">
+                    <img src="${imgUrl}" class="img-fluid rounded border shadow-sm" alt="Floor Plan">
+                </div>`;
+                  }
+                });
+
+                $("#property-gallery").html(
+                  galleryHtml ||
+                    '<div class="carousel-item active"><p class="p-5 text-center">No Images</p></div>',
+                );
+                $("#floor-plan-gallery").html(
+                  floorHtml || "<p class='ps-3'>No Floor Plans Available</p>",
+                );
+
+                // Re-initialize Bootstrap Carousel
+                const carouselEl = document.querySelector("#detail-carousel");
+                if (galleryCount > 0 && typeof bootstrap !== "undefined") {
+                  new bootstrap.Carousel(carouselEl, {
+                    interval: 3000,
+                    ride: "carousel",
+                  });
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Error loading property details:", error);
+          }
+        }
+
+        loadDetails();
+      });
+    </script>
+  </body>
+</html>

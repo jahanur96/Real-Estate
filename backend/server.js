@@ -17,7 +17,7 @@ const propertiesRoutes = require("./admin/routes/propertiesRoutes");
 const locationRoutes = require("./admin/routes/locationsRoutes");
 const testimonialsRoutes = require("./admin/routes/testimonialsRoutes");
 const propertyImagesRoutes = require("./admin/routes/propertyImagesRoutes");
-
+const contactRoutes = require("./admin/routes/contactRoutes");
 const app = express();
 
 // --- GLOBAL MIDDLEWARES ---
@@ -27,11 +27,13 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
-// --- STATIC FILES (Frontend Public Folder) ---
-// এটি login.html এবং অন্যান্য পাবলিক অ্যাসেট সার্ভ করবে
+app.use(
+  "/admin/uploads",
+  express.static(path.join(__dirname, "../frontend/admin/uploads")),
+);
+
 app.use(express.static(path.join(__dirname, "../frontend/public")));
 
-// --- AUTH ROUTE ---
 app.use("/auth", authRoutes);
 app.use("/category", categoryRoutes);
 app.use("/feature-category", featureCategoryRoutes);
@@ -41,7 +43,9 @@ app.use("/properties", propertiesRoutes);
 app.use("/locations", locationRoutes);
 app.use("/testimonials", testimonialsRoutes);
 app.use("/property-images", propertyImagesRoutes);
+app.use("/contact", contactRoutes);
 
+// Admin Page access (Route based protection)
 app.get("/admin", verifyToken, isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/admin/index.html"));
 });
@@ -53,7 +57,7 @@ app.use(
   express.static(path.join(__dirname, "../frontend/admin")),
 );
 
-// --- ROOT ROUTE ---
+// --- 4. ROOT ROUTE ---
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/public/login.html"));
 });
