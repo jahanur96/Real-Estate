@@ -24,21 +24,18 @@ exports.search = (req, res) => {
   const values = [];
   let count = 1;
 
-  // Category filter (Dropdown value)
   if (category && category !== "") {
     sql += ` AND p.category = $${count}`;
     values.push(parseInt(category));
     count++;
   }
 
-  // Location filter (Dropdown value)
   if (location && location !== "") {
     sql += ` AND p.location = $${count}`;
     values.push(parseInt(location));
     count++;
   }
 
-  // Keyword filter (Input text)
   if (keyword && keyword !== "") {
     sql += ` AND (p.property_title ILIKE $${count} OR p.short_description ILIKE $${count})`;
     values.push(`%${keyword}%`);

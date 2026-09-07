@@ -5,11 +5,9 @@ exports.submitContactForm = async (req, res) => {
   const { name, email, mobile, subject, message } = req.body;
 
   try {
-    // 1. Database-e save kora
     const sql = `INSERT INTO contact_messages (name, email, mobile, subject, message) VALUES ($1, $2, $3, $4, $5) RETURNING id`;
     const result = await db.query(sql, [name, email, mobile, subject, message]);
 
-    // 2. Email Pathanor Setup (Nodemailer)
     const transporter = nodemailer.createTransport({
       service: "gmail", //
       auth: {
@@ -20,7 +18,7 @@ exports.submitContactForm = async (req, res) => {
 
     const mailOptions = {
       from: '"Property Website" <balayet@uysys.com>',
-      to: email, // Sender-er kache confirmation jabe
+      to: email,
       subject: "Message Received - Property Website",
       html: `
                 <h3>Hello ${name},</h3>
@@ -31,7 +29,6 @@ exports.submitContactForm = async (req, res) => {
             `,
     };
 
-    // Email pathano
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) console.log("Email Error:", error);
       else console.log("Email Sent:", info.response);
